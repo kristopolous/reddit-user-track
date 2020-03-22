@@ -24,12 +24,18 @@ with open('userlist.txt') as fp:
         else:
             print("<< {} >>".format(who))
 
+        urllist = set()
+        if os.path.exists("{}/urllist.txt".format(who)):
+            with open("{}/urllist.txt".format(who)) as fp:
+                urllist = set(fp.read().splitlines())
+
         for x in submissions:
             try:
                 filename = os.path.basename(x.url)
             except:
                 continue
 
+            urllist.add(x.url)
             if len(filename) == 0:
                 continue
 
@@ -41,7 +47,12 @@ with open('userlist.txt') as fp:
 
             if not os.path.exists(path):
                 print(" --> {}".format(path))
-                urllib.request.urlretrieve(x.url, path)
+                try:
+                    urllib.request.urlretrieve(x.url, path)
+                except Exception as ex:
+                    print("woops, can't get {}: {}".format(x.url, ex))
+                    ignore.add(path)
+                    continue
             else:
                 print("Exists: {}".format(filename))
 
@@ -53,6 +64,9 @@ with open('userlist.txt') as fp:
                 os.unlink(path)
             else:
                 hashset.add(md5)
+
+        with open("{}/urllist.txt".format(who), 'w') as fp:
+            fp.write('\n'.join(list(urllist)))
 
 with open('ignore.txt', 'w') as f:
     f.write('\n'.join(list(ignore)))
