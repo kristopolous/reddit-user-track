@@ -16,7 +16,7 @@ hashset = set()
 
 with open('userlist.txt') as fp:
     for cnt, who in enumerate(fp):
-        who = who.strip()
+        who = who.strip('/\n ')
         submissions = reddit.redditor(who).new()
         if not os.path.exists(who):
             print("Making dir: {}".format(who))
