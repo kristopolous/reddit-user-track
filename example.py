@@ -12,8 +12,6 @@ ignore = False
 with open('ignore.txt') as fp:
     ignore = set(fp.read().splitlines())
 
-print(ignore)
-
 hashset = set()
 
 with open('userlist.txt') as fp:
@@ -36,7 +34,12 @@ with open('userlist.txt') as fp:
                 continue
 
             path = "{}/{}".format(who, filename)
-            if not os.path.exists(path) and not path in ignore:
+
+            if path in ignore:
+                print("Ignoring: {}".format(filename))
+                continue
+
+            if not os.path.exists(path):
                 print(" --> {}".format(path))
                 urllib.request.urlretrieve(x.url, path)
             else:
