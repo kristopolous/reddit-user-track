@@ -42,7 +42,8 @@ with open('userlist.txt') as fp:
             path = "{}/{}".format(who, filename)
 
             if path in ignore:
-                print("Ignoring: {}".format(filename))
+                # print("Ignoring: {}".format(filename))
+                pass
                 continue
 
             if not os.path.exists(path):
@@ -54,7 +55,8 @@ with open('userlist.txt') as fp:
                     ignore.add(path)
                     continue
             else:
-                print("Exists: {}".format(filename))
+                # print("Exists: {}".format(filename))
+                pass
 
             md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
 
