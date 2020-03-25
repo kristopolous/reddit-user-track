@@ -17,7 +17,12 @@ hashset = set()
 with open('userlist.txt') as fp:
     for cnt, who in enumerate(fp):
         who = who.strip('/\n ')
-        submissions = reddit.redditor(who).new()
+        try:
+            submissions = reddit.redditor(who).new()
+        except:
+            print("who is {}".format(who))
+            continue
+
         if not os.path.exists(who):
             print("Making dir: {}".format(who))
             os.mkdir(who)
@@ -28,6 +33,12 @@ with open('userlist.txt') as fp:
         if os.path.exists("{}/urllist.txt".format(who)):
             with open("{}/urllist.txt".format(who)) as fp:
                 urllist = set(fp.read().splitlines())
+
+        try:
+            submissions = list(submissions)
+        except:
+            print("Woops, no submissions: {}".format(who))
+            continue
 
         for x in submissions:
             try:
