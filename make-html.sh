@@ -13,7 +13,13 @@ span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;backgro
 <script src=remember.js></script>
 ENDL
 lastdir=''
-for i in $(find . -name \*.jpg -or -name \*.gif -or -name \*.png); do 
+if [[ -n "$1" ]];then 
+  list=$(find . \( -name \*.jpg -or -name \*.gif -or -name \*.png \) -and -ctime -$1 ); 
+else 
+  list=$(find . -name \*.jpg -or -name \*.gif -or -name \*.png)
+fi
+
+for i in $list; do
   dir=$(dirname $i)
   if [[ "$dir" != "$lastdir" ]]; then
     [[ -n "$lastdir" ]] && echo "</div></div>"
