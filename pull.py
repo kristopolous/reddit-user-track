@@ -15,7 +15,9 @@ with open('ignore.txt') as fp:
 hashset = set()
 
 with open('userlist.txt') as fp:
-    for cnt, who in enumerate(fp):
+    all = list(set([x[1] for x in enumerate(fp)]))
+
+    for who in all:
         who = who.strip('/\n ')
         try:
             submissions = reddit.redditor(who).new()
