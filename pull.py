@@ -16,7 +16,6 @@ hashset = set()
 
 with open('userlist.txt') as fp:
     all = list(set([x[1].strip('/\n ') for x in enumerate(fp)]))
-    print(all)
 
     for who in all:
         try:
