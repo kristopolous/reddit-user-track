@@ -8,9 +8,16 @@ import sys
 
 reddit = praw.Reddit(client_id=secrets.client_id, client_secret=secrets.client_secret, password=secrets.password, user_agent='test', username=secrets.username)
 
-ignore = False
-with open('ignore.txt') as fp:
-    ignore = set(fp.read().splitlines())
+ignore = set()
+fail = set()
+
+if os.path.exists('ignore.txt'):
+    with open('ignore.txt') as fp:
+        ignore = set(fp.read().splitlines())
+
+if os.path.exists('fail.txt'):
+    with open('fail.txt') as fp:
+        fail = set(fp.read().splitlines())
 
 hashset = set()
 
@@ -18,6 +25,10 @@ with open('userlist.txt') as fp:
     all = list(set([x[1].strip('/\n ') for x in enumerate(fp)]))
 
     for who in all:
+        if who in fail:
+            print("Skipping {}".format(who))
+            continue
+
         try:
             submissions = reddit.redditor(who).new()
         except:
@@ -38,7 +49,8 @@ with open('userlist.txt') as fp:
         try:
             submissions = list(submissions)
         except:
-            print("Woops, no submissions: {}".format(who))
+            print("Woops, no submissions {}".format(who))
+            fail.add(who)
             continue
 
         for x in submissions:
@@ -81,6 +93,9 @@ with open('userlist.txt') as fp:
 
         with open("{}/urllist.txt".format(who), 'w') as fp:
             fp.write('\n'.join(list(urllist)))
+
+with open('fail.txt', 'w') as f:
+    f.write('\n'.join(list(fail)))
 
 with open('ignore.txt', 'w') as f:
     f.write('\n'.join(list(ignore)))
