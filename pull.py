@@ -83,7 +83,7 @@ with open('userlist.txt') as fp:
 
             md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
 
-            if md5 in cksum and cksum.get(md5) not filename:
+            if md5 in cksum and cksum.get(md5) is not filename:
                 print("dupe: {}".format(filename))
                 ignore.add(path)
                 os.unlink(path)
@@ -98,3 +98,6 @@ with open('fail.txt', 'w') as f:
 
 with open('ignore.txt', 'w') as f:
     f.write('\n'.join(list(ignore)))
+
+with open('cksum.json', 'w') as f:
+    json.dump(cksum, f)
