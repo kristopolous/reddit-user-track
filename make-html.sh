@@ -30,7 +30,7 @@ for i in $list; do
     echo "<span><a href=https://old.reddit.com/u/$user>$user</a></span>"
     echo "<div class=inner onclick=\"this.classList.toggle('show')\">"
   fi
-  echo "<img src="$i">"
+  echo "<img title="$i" src="$i">"
   lastdir=$dir
 done
 
