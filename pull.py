@@ -83,8 +83,8 @@ with open('userlist.txt') as fp:
 
             md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
 
-            if md5 in cksum and cksum.get(md5) is not filename:
-                print("dupe: {}".format(filename))
+            if md5 in cksum and cksum.get(md5) != filename:
+                print("dupe: {}".format(type(filename)))
                 ignore.add(path)
                 os.unlink(path)
             else:
