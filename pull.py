@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from glob import glob
 import praw
 import os
 import urllib
@@ -20,6 +21,20 @@ ignore = lf('ignore.txt') or set()
 fail = lf('fail.txt') or set()
 cksum = lf('cksum.json', 'json') or {}
 
+def md5check(filename, path):
+    global cksum
+    global ignore
+
+    md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
+
+    if md5 in cksum and cksum.get(md5) != filename:
+        print("dupe: {}".format(filename))
+        ignore.add(path)
+        os.unlink(path)
+    else:
+        pass
+        cksum[md5] = filename
+
 with open('userlist.txt') as fp:
     all = list(set([x[1].strip('/\n ') for x in enumerate(fp)]))
 
@@ -38,7 +53,7 @@ with open('userlist.txt') as fp:
             print("Making dir: {}".format(who))
             os.mkdir(who)
         else:
-            print("<< {} >>".format(who))
+            print(" {} >>".format(who))
 
         urllist = set()
         if os.path.exists("{}/urllist.txt".format(who)):
@@ -51,6 +66,12 @@ with open('userlist.txt') as fp:
             print("Woops, no submissions {}".format(who))
             fail.add(who)
             continue
+
+        cksum_seen = list(cksum.values())
+        for path in glob("{}/*[jp][np]g".format(who)):
+            filename = os.path.basename(path)
+            if filename not in cksum_seen:
+                md5check(filename, path)
 
         for x in submissions:
             try:
@@ -81,14 +102,7 @@ with open('userlist.txt') as fp:
                 # print("Exists: {}".format(filename))
                 pass
 
-            md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
-
-            if md5 in cksum and cksum.get(md5) != filename:
-                print("dupe: {}".format(type(filename)))
-                ignore.add(path)
-                os.unlink(path)
-            else:
-                cksum[md5] = filename
+            md5check(filename, path)
 
         with open("{}/urllist.txt".format(who), 'w') as fp:
             fp.write('\n'.join(list(urllist)))
