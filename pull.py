@@ -3,23 +3,22 @@ import praw
 import os
 import urllib
 import secrets
+import json
 import hashlib
 import sys
 
 reddit = praw.Reddit(client_id=secrets.client_id, client_secret=secrets.client_secret, password=secrets.password, user_agent='test', username=secrets.username)
 
-ignore = set()
-fail = set()
+def lf(path, kind = 'set'):
+    if os.path.exists(path):
+        with open(path) as fp:
+            if kind == 'json':
+                return json.load(fp)
+            return set(fp.read().splitlines())
 
-if os.path.exists('ignore.txt'):
-    with open('ignore.txt') as fp:
-        ignore = set(fp.read().splitlines())
-
-if os.path.exists('fail.txt'):
-    with open('fail.txt') as fp:
-        fail = set(fp.read().splitlines())
-
-hashset = set()
+ignore = lf('ignore.txt') or set()
+fail = lf('fail.txt') or set()
+cksum = lf('cksum.json', 'json') or {}
 
 with open('userlist.txt') as fp:
     all = list(set([x[1].strip('/\n ') for x in enumerate(fp)]))
@@ -84,12 +83,12 @@ with open('userlist.txt') as fp:
 
             md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
 
-            if md5 in hashset:
+            if md5 in cksum and cksum.get(md5) not filename:
                 print("dupe: {}".format(filename))
                 ignore.add(path)
                 os.unlink(path)
             else:
-                hashset.add(md5)
+                cksum[md5] = filename
 
         with open("{}/urllist.txt".format(who), 'w') as fp:
             fp.write('\n'.join(list(urllist)))
