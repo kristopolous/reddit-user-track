@@ -14,28 +14,28 @@ div.inner.show { background: #333; margin-bottom: 0; }
 </style>
 <script src=remember.js></script>
 ENDL
-lastdir=''
 path="."
 args=""
 if [[ -e "$1" ]]; then 
   path="$1" 
 elif [[ -n "$1" ]]; then 
-  args=" -and -ctime -$1"
+  args="-and -ctime -$1"
 fi
-list=$(find $path \( -name \*.jpg -or -name \*.gif -or -name \*.png \) $args )
+list=$(find $path -mindepth 1 -type d -and -not -path "*/.git*" )
 
-for i in $list; do
-  dir=$(dirname $i)
-  if [[ "$dir" != "$lastdir" ]]; then
-    [[ -n "$lastdir" ]] && echo "</div></div>"
-    user=$(basename $dir)
+for dir in $list; do
+  sublist=$( find $dir \( -name \*.jpg -or -name \*.gif -or -name \*.png \) $args )
+  if [ -n "$sublist" ]; then
     echo "<div class=wrap>"
-    echo "<span><a href=https://old.reddit.com/u/$user>$user</a></span>"
-    echo "<div class=inner onclick=\"this.classList.toggle('show')\">"
+      user=$(basename $dir)
+      echo "<span><a href=https://old.reddit.com/u/$user>$user</a></span>"
+      echo "<div class=inner onclick=\"this.classList.toggle('show')\">"
+        for i in $(identify -format "%[fx:w/h] %f\n" $sublist | sort -n | awk ' { print $2 } '); do
+          echo "<img title="$i" src="$dir/$i">"
+        done
+      echo "</div>"
+    echo "</div>"
   fi
-  echo "<img title="$i" src="$i">"
-  lastdir=$dir
 done
 
-echo "</div>"
 } > index.html
