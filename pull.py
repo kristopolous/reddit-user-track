@@ -30,7 +30,7 @@ def md5check(filename, path):
     md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
 
     if md5 in cksum and cksum.get(md5) != filename:
-        print("dupe: {}".format(filename))
+        print("  dupe: {}".format(filename))
         ignore.add(path)
         os.unlink(path)
     else:
@@ -60,7 +60,7 @@ with open('userlist.txt') as fp:
             continue
 
         if not os.path.exists(who):
-            print("Making dir {}".format(who))
+            print(" /{} (Making dir)".format(who))
             os.mkdir(who)
         else:
             print(" /{}".format(who))
