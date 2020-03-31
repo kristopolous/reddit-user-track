@@ -7,6 +7,8 @@ import secrets
 import json
 import hashlib
 import sys
+import pdb
+import inspect
 
 reddit = praw.Reddit(client_id=secrets.client_id, client_secret=secrets.client_secret, password=secrets.password, user_agent='test', username=secrets.username)
 
@@ -35,6 +37,14 @@ def md5check(filename, path):
         pass
         cksum[md5] = filename
 
+if len(sys.argv) > 1:
+    user = sys.argv[1].strip()
+    if user:
+       submissions = reddit.redditor(user).submissions.new()
+       for s in submissions:
+           print(s.url)
+       sys.exit(0)
+
 with open('userlist.txt') as fp:
     all = list(set([x[1].strip('/\n ') for x in enumerate(fp)]))
 
@@ -44,13 +54,13 @@ with open('userlist.txt') as fp:
             continue
 
         try:
-            submissions = reddit.redditor(who).new()
+            submissions = reddit.redditor(who).submissions.new()
         except:
             print("who is {}".format(who))
             continue
 
         if not os.path.exists(who):
-            print("Making dir: {}".format(who))
+            print("Making dir {}".format(who))
             os.mkdir(who)
         else:
             print(" /{}".format(who))
@@ -86,7 +96,7 @@ with open('userlist.txt') as fp:
             path = "{}/{}".format(who, filename)
 
             if path in ignore:
-                # print("Ignoring: {}".format(filename))
+                print("  Ignoring: {}".format(filename))
                 pass
                 continue
 
