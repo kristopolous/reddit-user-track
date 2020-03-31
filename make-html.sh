@@ -6,7 +6,7 @@ a { text-decoration: none; color: #aac }
 a:hover { color: #99f}
 body { font-size:0;margin: 0; padding: 0; background: black; }
 img { width: 33.3% }
-div.wrap { width: 95% }
+div.wrap { width: 97% }
 div.inner {margin-bottom: 2rem;max-height:60rem;overflow-y:auto;border-bottom:3px solid #777 }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
 .show img { display: none }

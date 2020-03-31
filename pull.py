@@ -53,7 +53,7 @@ with open('userlist.txt') as fp:
             print("Making dir: {}".format(who))
             os.mkdir(who)
         else:
-            print(" {} >>".format(who))
+            print(" /{}".format(who))
 
         urllist = set()
         if os.path.exists("{}/urllist.txt".format(who)):
