@@ -7,7 +7,7 @@ a:hover { color: #99f}
 body { font-size:0;margin: 0; padding: 0; background: black; }
 img { width: 33.3% }
 div.wrap { width: 97% }
-div.inner {margin-bottom: 2rem;max-height:60rem;overflow-y:auto;border-bottom:3px solid #777 }
+div.inner {max-height:60rem;overflow-y:auto;border-bottom:3px solid #777 }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
 .show img { display: none }
 div.inner.show { background: #333; margin-bottom: 0; }
@@ -15,11 +15,14 @@ div.inner.show { background: #333; margin-bottom: 0; }
 <script src=remember.js></script>
 ENDL
 lastdir=''
-if [[ -n "$1" ]];then 
-  list=$(find . \( -name \*.jpg -or -name \*.gif -or -name \*.png \) -and -ctime -$1 ); 
-else 
-  list=$(find . -name \*.jpg -or -name \*.gif -or -name \*.png)
+path="."
+args=""
+if [[ -e "$1" ]]; then 
+  path="$1" 
+elif [[ -n "$1" ]]; then 
+  args=" -and -ctime -$1"
 fi
+list=$(find $path \( -name \*.jpg -or -name \*.gif -or -name \*.png \) $args )
 
 for i in $list; do
   dir=$(dirname $i)
