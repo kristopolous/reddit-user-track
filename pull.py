@@ -71,7 +71,7 @@ def cksumcheck(path):
 
     ihash = str(ihash)
 
-    if ihash in cksum and cksum.get(ihash) != filename and not cksum.get(ihash) in filename: 
+    if ihash in cksum and not ( filename in cksum[ihash] or cksum[ihash] in filename ):
         print("  dupe: {} with {} ".format(filename, cksum.get(ihash)))
         ignore.add(path)
         os.unlink(path)
@@ -145,8 +145,9 @@ for who in all:
 
         if not entry.url in urllist: 
             print(" --> {}".format(path))
-            if parts.netloc == 'imgur.com':
-                pieces = parts.path.strip('/').split('/')
+            if parts.netloc in ['imgur.com','i.imgur.com']:
+                noext = os.path.splitext(parts.path)[0]
+                pieces = noext.strip('/').split('/')
                 if pieces[0] == 'a':
                     for x in imgur.get_album_images(pieces[1]):
                         url_to_get = x.link
@@ -155,8 +156,11 @@ for who in all:
                     obj = imgur.get_image(pieces[0])
                     url_to_get = obj.link
 
-                ext = os.path.splitext(url_to_get)[1]
-                path += ext
+                hasext = os.path.splitext(path)
+                if not hasext[1]:
+                    ext = os.path.splitext(url_to_get)[1]
+                    path += ext
+
                 print("     \_{}".format(url_to_get))
 
             if parts.netloc == 'gfycat.com':
