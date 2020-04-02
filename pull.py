@@ -130,20 +130,26 @@ for who in all:
             #print("  Ignoring: {}".format(filename))
             continue
 
+        parts = urlparse(x.url)
+        url_to_get = x.url
+
+        if parts.netloc == 'gfycat.com':
+           path += '.mp4'
+
         if not os.path.exists(path):
             print(" --> {}".format(path))
-            parts = urlparse(x.url)
-            url_to_get = x.url
             if parts.netloc == 'gfycat.com':
                 url_path = parts.path.strip('/')
-                obj = gfycat.query_gfy(url_path)
-                url_to_get = obj.get('gfyItem').get('mp4Url')
-                print("     \_{}".format(url_to_get))
-                path += '.mp4'
+                try:
+                    obj = gfycat.query_gfy(url_path)
+                    url_to_get = obj.get('gfyItem').get('mp4Url')
+                    print("     \_{}".format(url_to_get))
 
-        # Since we could have possibly mutated the path, we
-        # check it again
-        if not os.path.exists(path):
+                except:
+                    print("     \_ Unable to get {}".format(x.url))
+                    ignore.add(path)
+                    continue
+
             try:
                 urllib.request.urlretrieve(url_to_get, path)
 
