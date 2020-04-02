@@ -48,19 +48,20 @@ ignore = lf('ignore.txt') or set()
 fail = lf('fail.txt') or set()
 cksum = lf('cksum.json', 'json') or {}
 
-def cksumcheck(filename, path):
+def cksumcheck(path):
     global cksum
     global ignore
 
-    style= 'md5'
+    style = 'md5'
     ext = os.path.splitext(path)[1]
+    filename = os.path.basename(path)
     if ext in ['.jpg','.png']:
         try:
             ihash = imagehash.average_hash(Image.open(path))
             style = 'ihash'
 
         except:
-            style='md5'
+            style = 'md5'
 
     if style == 'md5':
         ihash = hashlib.md5(open(path, 'rb').read()).hexdigest()
@@ -70,8 +71,8 @@ def cksumcheck(filename, path):
 
     ihash = str(ihash)
 
-    if ihash in cksum and cksum.get(ihash) != filename:
-        print("  dupe: {}".format(filename))
+    if ihash in cksum and cksum.get(ihash) != filename and not cksum.get(ihash) in filename: 
+        print("  dupe: {} with {} ".format(filename, cksum.get(ihash)))
         ignore.add(path)
         os.unlink(path)
     else:
@@ -97,7 +98,7 @@ for who in all:
     for path in glob("{}/*[jp][np]g".format(content)):
         filename = os.path.basename(path)
         if filename not in cksum_seen:
-            cksumcheck(filename, path)
+            cksumcheck(path)
 
     if who in fail:
         print("Skipping {}".format(who))
@@ -182,8 +183,13 @@ for who in all:
             # print("Exists: {}".format(filename))
             pass
 
+        if not os.path.exists(path):
+            attempt = glob("{}.*".format(path))
+            if len(attempt) > 0:
+                path = attempt[0]
+
         if os.path.exists(path):
-            cksumcheck(filename, path)
+            cksumcheck(path)
         else:
             print(" !! {}".format(path))
 
