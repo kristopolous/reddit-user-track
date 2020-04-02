@@ -45,6 +45,8 @@ def md5check(filename, path):
 
     #print(style,ext,ihash,path)
 
+    ihash = str(ihash)
+
     if ihash in cksum and cksum.get(ihash) != filename:
         print("  dupe: {}".format(filename))
         ignore.add(path)
