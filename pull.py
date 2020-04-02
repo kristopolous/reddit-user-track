@@ -11,8 +11,19 @@ import hashlib
 import inspect
 from PIL import Image
 import imagehash
+from gfycat.client import GfycatClient
 
-reddit = praw.Reddit(client_id=secrets.client_id, client_secret=secrets.client_secret, password=secrets.password, user_agent='test', username=secrets.username)
+reddit = praw.Reddit(
+    client_id=secrets.reddit['id'], 
+    client_secret=secrets.reddit['secret'], 
+    password=secrets.reddit['password'], user_agent='test', 
+    username=secrets.reddit['username']
+)
+
+gfycat = GfycatClient(
+    secrets.gfycat['id'],
+    secrets.gfycat['secret']
+)
 
 def lf(path, kind = 'set'):
     if os.path.exists(path):
@@ -59,84 +70,82 @@ def cksumcheck(filename, path):
         cksum[ihash] = filename
 
 if len(sys.argv) > 1:
-    user = sys.argv[1].strip()
-    if user:
-       submissions = reddit.redditor(user).submissions.new()
-       for s in submissions:
-           print(s.url)
-       sys.exit(0)
+    all = [sys.argv[1].strip()]
 
-with open('userlist.txt') as fp:
-    all = sorted(list(set([x[1].strip('/\n ') for x in enumerate(fp)])), key=str.casefold)
+else: 
+    with open('userlist.txt') as fp:
+        all = sorted(list(set([x[1].strip('/\n ') for x in enumerate(fp)])), key=str.casefold)
 
-    for who in all:
+for who in all:
+    content = "data/{}".format(who)
 
-        if not os.path.exists(who):
-            print(" /{} (Making dir)".format(who))
-            os.mkdir(who)
-        else:
-            print(" /{}".format(who))
+    if not os.path.exists(content):
+        print(" /{} (Making dir)".format(content))
+        os.mkdir(content)
+    else:
+        print(" /{}".format(content))
 
-        cksum_seen = list(cksum.values())
-        for path in glob("{}/*[jp][np]g".format(who)):
-            filename = os.path.basename(path)
-            if filename not in cksum_seen:
-                cksumcheck(filename, path)
-
-        if who in fail:
-            print("Skipping {}".format(who))
-            continue
-
-        urllist = set()
-        if os.path.exists("{}/urllist.txt".format(who)):
-            with open("{}/urllist.txt".format(who)) as fp:
-                urllist = set(fp.read().splitlines())
-
-        try:
-            submissions = reddit.redditor(who).submissions.new()
-        except:
-            print("who is {}".format(who))
-            continue
-
-        try:
-            submissions = list(submissions)
-        except:
-            print("Woops, no submissions {}".format(who))
-            fail.add(who)
-            continue
-
-        for x in submissions:
-            try:
-                filename = os.path.basename(x.url)
-            except:
-                continue
-
-            urllist.add(x.url)
-            if len(filename) == 0:
-                continue
-
-            path = "{}/{}".format(who, filename)
-
-            if path in ignore:
-                #print("  Ignoring: {}".format(filename))
-                continue
-
-            if not os.path.exists(path):
-                print(" --> {}".format(path))
-                try:
-                    urllib.request.urlretrieve(x.url, path)
-                except Exception as ex:
-                    print("woops, can't get {}: {}".format(x.url, ex))
-                    ignore.add(path)
-                    continue
-            else:
-                # print("Exists: {}".format(filename))
-                pass
-
+    cksum_seen = list(cksum.values())
+    for path in glob("{}/*[jp][np]g".format(content)):
+        filename = os.path.basename(path)
+        if filename not in cksum_seen:
             cksumcheck(filename, path)
 
-        with open("{}/urllist.txt".format(who), 'w') as fp:
-            fp.write('\n'.join(list(urllist)))
+    if who in fail:
+        print("Skipping {}".format(who))
+        continue
+
+    urllist = set()
+    if os.path.exists("{}/urllist.txt".format(content)):
+        with open("{}/urllist.txt".format(content)) as fp:
+            urllist = set(fp.read().splitlines())
+
+    try:
+        submissions = reddit.redditor(who).submissions.new()
+    except:
+        print("who is {}".format(who))
+        continue
+
+    try:
+        submissions = list(submissions)
+    except:
+        print("Woops, no submissions {}".format(who))
+        fail.add(who)
+        continue
+
+    for x in submissions:
+        try:
+            filename = os.path.basename(x.url)
+        except:
+            continue
+
+        urllist.add(x.url)
+        if len(filename) == 0:
+            continue
+
+        path = "{}/{}".format(content, filename)
+
+        if filename in ignore:
+            #print("  Ignoring: {}".format(filename))
+            continue
+
+        if not os.path.exists(path):
+            print(" --> {}".format(path))
+            print(x.url)
+            try:
+                urllib.request.urlretrieve(x.url, path)
+            except Exception as ex:
+                print("woops, can't get {}: {}".format(x.url, ex))
+                ignore.add(path)
+                continue
+        else:
+            # print("Exists: {}".format(filename))
+            pass
+
+        cksumcheck(filename, path)
+
+    with open("{}/urllist.txt".format(content), 'w') as fp:
+        fp.write('\n'.join(list(urllist)))
 
 with open('fail.txt', 'w') as f:
     f.write('\n'.join(list(fail)))
