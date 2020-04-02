@@ -96,8 +96,7 @@ with open('userlist.txt') as fp:
             path = "{}/{}".format(who, filename)
 
             if path in ignore:
-                print("  Ignoring: {}".format(filename))
-                pass
+                #print("  Ignoring: {}".format(filename))
                 continue
 
             if not os.path.exists(path):
