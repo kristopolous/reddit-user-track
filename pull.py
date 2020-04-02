@@ -148,13 +148,19 @@ for who in all:
             if parts.netloc in ['imgur.com','i.imgur.com']:
                 noext = os.path.splitext(parts.path)[0]
                 pieces = noext.strip('/').split('/')
-                if pieces[0] == 'a':
-                    for x in imgur.get_album_images(pieces[1]):
-                        url_to_get = x.link
+                try:
+                    if pieces[0] == 'a':
+                        for x in imgur.get_album_images(pieces[1]):
+                            url_to_get = x.link
 
-                else:
-                    obj = imgur.get_image(pieces[0])
-                    url_to_get = obj.link
+                    else:
+                        obj = imgur.get_image(pieces[0])
+                        url_to_get = obj.link
+
+                except:
+                    print("     \_ Unable to get {}".format(entry.url))
+                    ignore.add(path)
+                    continue
 
                 hasext = os.path.splitext(path)
                 if not hasext[1]:
