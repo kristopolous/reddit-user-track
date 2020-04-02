@@ -13,6 +13,7 @@ import inspect
 from PIL import Image
 import imagehash
 from gfycat.client import GfycatClient
+from imgurpython import ImgurClient
 
 reddit = praw.Reddit(
     client_id=secrets.reddit['id'], 
@@ -25,6 +26,12 @@ gfycat = GfycatClient(
     secrets.gfycat['id'],
     secrets.gfycat['secret']
 )
+
+imgur = ImgurClient(
+    secrets.imgur['id'],
+    secrets.imgur['secret']
+)
+
 
 def lf(path, kind = 'set'):
     if os.path.exists(path):
@@ -114,13 +121,12 @@ for who in all:
         fail.add(who)
         continue
 
-    for x in submissions:
+    for entry in submissions:
         try:
-            filename = os.path.basename(x.url)
+            filename = os.path.basename(entry.url)
         except:
             continue
 
-        urllist.add(x.url)
         if len(filename) == 0:
             continue
 
@@ -130,14 +136,28 @@ for who in all:
             #print("  Ignoring: {}".format(filename))
             continue
 
-        parts = urlparse(x.url)
-        url_to_get = x.url
+        parts = urlparse(entry.url)
+        url_to_get = entry.url
 
         if parts.netloc == 'gfycat.com':
            path += '.mp4'
 
-        if not os.path.exists(path):
+        if not entry.url in urllist: 
             print(" --> {}".format(path))
+            if parts.netloc == 'imgur.com':
+                pieces = parts.path.strip('/').split('/')
+                if pieces[0] == 'a':
+                    for x in imgur.get_album_images(pieces[1]):
+                        url_to_get = x.link
+
+                else:
+                    obj = imgur.get_image(pieces[0])
+                    url_to_get = obj.link
+
+                ext = os.path.splitext(url_to_get)[1]
+                path += ext
+                print("     \_{}".format(url_to_get))
+
             if parts.netloc == 'gfycat.com':
                 url_path = parts.path.strip('/')
                 try:
@@ -146,22 +166,26 @@ for who in all:
                     print("     \_{}".format(url_to_get))
 
                 except:
-                    print("     \_ Unable to get {}".format(x.url))
+                    print("     \_ Unable to get {}".format(entry.url))
                     ignore.add(path)
                     continue
 
             try:
                 urllib.request.urlretrieve(url_to_get, path)
+                urllist.add(entry.url)
 
             except Exception as ex:
-                print("woops, can't get {}: {}".format(x.url, ex))
+                print("woops, can't get {}: {}".format(entry.url, ex))
                 ignore.add(path)
                 continue
         else:
             # print("Exists: {}".format(filename))
             pass
 
-        cksumcheck(filename, path)
+        if os.path.exists(path):
+            cksumcheck(filename, path)
+        else:
+            print(" !! {}".format(path))
 
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
