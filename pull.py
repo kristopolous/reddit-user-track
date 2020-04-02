@@ -29,12 +29,17 @@ def md5check(filename, path):
     global cksum
     global ignore
 
-    style= ''
+    style= 'md5'
     ext = os.path.splitext(path)[1]
     if ext in ['.jpg','.png']:
-        ihash = imagehash.average_hash(Image.open(path))
-        style='ihash'
-    else:
+        try:
+            ihash = imagehash.average_hash(Image.open(path))
+            style = 'ihash'
+
+        except:
+            style='md5'
+
+    if style == 'md5':
         ihash = hashlib.md5(open(path, 'rb').read()).hexdigest()
         style='md5'
 
