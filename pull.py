@@ -67,7 +67,7 @@ if len(sys.argv) > 1:
        sys.exit(0)
 
 with open('userlist.txt') as fp:
-    all = sorted(list(set([x[1].strip('/\n ') for x in enumerate(fp)])))
+    all = sorted(list(set([x[1].strip('/\n ') for x in enumerate(fp)])), key=str.casefold)
 
     for who in all:
 
