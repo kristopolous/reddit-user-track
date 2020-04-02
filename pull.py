@@ -5,10 +5,12 @@ import os
 import urllib
 import secrets
 import json
-import hashlib
 import sys
 import pdb
+import hashlib
 import inspect
+from PIL import Image
+import imagehash
 
 reddit = praw.Reddit(client_id=secrets.client_id, client_secret=secrets.client_secret, password=secrets.password, user_agent='test', username=secrets.username)
 
@@ -27,15 +29,23 @@ def md5check(filename, path):
     global cksum
     global ignore
 
-    md5 = hashlib.md5(open(path, 'rb').read()).hexdigest()
+    style= ''
+    ext = os.path.splitext(path)[1]
+    if ext in ['.jpg','.png']:
+        ihash = imagehash.average_hash(Image.open(path))
+        style='ihash'
+    else:
+        ihash = hashlib.md5(open(path, 'rb').read()).hexdigest()
+        style='md5'
 
-    if md5 in cksum and cksum.get(md5) != filename:
+    #print(style,ext,ihash,path)
+
+    if ihash in cksum and cksum.get(ihash) != filename:
         print("  dupe: {}".format(filename))
         ignore.add(path)
         os.unlink(path)
     else:
-        pass
-        cksum[md5] = filename
+        cksum[ihash] = filename
 
 if len(sys.argv) > 1:
     user = sys.argv[1].strip()
