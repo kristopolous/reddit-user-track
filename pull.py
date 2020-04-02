@@ -66,15 +66,6 @@ with open('userlist.txt') as fp:
     all = list(set([x[1].strip('/\n ') for x in enumerate(fp)]))
 
     for who in all:
-        if who in fail:
-            print("Skipping {}".format(who))
-            continue
-
-        try:
-            submissions = reddit.redditor(who).submissions.new()
-        except:
-            print("who is {}".format(who))
-            continue
 
         if not os.path.exists(who):
             print(" /{} (Making dir)".format(who))
@@ -82,10 +73,26 @@ with open('userlist.txt') as fp:
         else:
             print(" /{}".format(who))
 
+        cksum_seen = list(cksum.values())
+        for path in glob("{}/*[jp][np]g".format(who)):
+            filename = os.path.basename(path)
+            if filename not in cksum_seen:
+                md5check(filename, path)
+
+        if who in fail:
+            print("Skipping {}".format(who))
+            continue
+
         urllist = set()
         if os.path.exists("{}/urllist.txt".format(who)):
             with open("{}/urllist.txt".format(who)) as fp:
                 urllist = set(fp.read().splitlines())
+
+        try:
+            submissions = reddit.redditor(who).submissions.new()
+        except:
+            print("who is {}".format(who))
+            continue
 
         try:
             submissions = list(submissions)
@@ -93,12 +100,6 @@ with open('userlist.txt') as fp:
             print("Woops, no submissions {}".format(who))
             fail.add(who)
             continue
-
-        cksum_seen = list(cksum.values())
-        for path in glob("{}/*[jp][np]g".format(who)):
-            filename = os.path.basename(path)
-            if filename not in cksum_seen:
-                md5check(filename, path)
 
         for x in submissions:
             try:
