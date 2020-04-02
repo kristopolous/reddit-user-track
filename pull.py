@@ -18,7 +18,11 @@ def lf(path, kind = 'set'):
     if os.path.exists(path):
         with open(path) as fp:
             if kind == 'json':
-                return json.load(fp)
+                try:
+                    return json.load(fp)
+                except:
+                    return {}
+
             return set(fp.read().splitlines())
 
 ignore = lf('ignore.txt') or set()
