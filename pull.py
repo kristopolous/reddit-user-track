@@ -133,7 +133,7 @@ with open('userlist.txt') as fp:
                 # print("Exists: {}".format(filename))
                 pass
 
-            md5check(filename, path)
+            cksumcheck(filename, path)
 
         with open("{}/urllist.txt".format(who), 'w') as fp:
             fp.write('\n'.join(list(urllist)))
