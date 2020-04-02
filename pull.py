@@ -25,7 +25,7 @@ ignore = lf('ignore.txt') or set()
 fail = lf('fail.txt') or set()
 cksum = lf('cksum.json', 'json') or {}
 
-def md5check(filename, path):
+def cksumcheck(filename, path):
     global cksum
     global ignore
 
@@ -77,7 +77,7 @@ with open('userlist.txt') as fp:
         for path in glob("{}/*[jp][np]g".format(who)):
             filename = os.path.basename(path)
             if filename not in cksum_seen:
-                md5check(filename, path)
+                cksumcheck(filename, path)
 
         if who in fail:
             print("Skipping {}".format(who))
