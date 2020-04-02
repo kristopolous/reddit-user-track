@@ -21,7 +21,7 @@ if [[ -e "$1" ]]; then
 elif [[ -n "$1" ]]; then 
   args="-and -ctime -$1"
 fi
-list=$(find $path -mindepth 1 -type d -and -not -path "*/.git*" | sort )
+list=$(find data/$path -mindepth 1 -type d -and -not -path "*/.git*" | sort )
 
 for dir in $list; do
   sublist=$( find $dir \( -name \*.jpg -or -name \*.gif -or -name \*.png \) $args )
