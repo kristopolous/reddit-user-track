@@ -30,16 +30,17 @@ for dir in $list; do
       user=$(basename $dir)
       echo "<span><a href=https://old.reddit.com/u/$user>$user</a></span>"
       echo "<div class=inner onclick=\"this.classList.toggle('show')\">"
-        for i in $(identify -format "%[fx:w/h] %f\n" $sublist | sort -n | awk ' { print $2 } ' | uniq ); do
+        for i in $sublist; do
+          #(identify -format "%[fx:w/h] %f\n" $sublist | sort -n | awk ' { print $2 } ' | uniq ); do
           ext="${i##*.}"
           if [[ $ext == 'mp4' ]]; then
             cat << ENDL
               <video autoplay loop muted="" nocontrols>
-                <source src="$dir/$i">
+                <source src="$i">
               </video>
 ENDL
           else
-            echo "<img title="$i" src="$dir/$i">"
+            echo "<img title="$i" src="$i">"
           fi
         done
       echo "</div>"
