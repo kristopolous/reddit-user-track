@@ -144,7 +144,7 @@ for who in all:
            path += '.mp4'
 
         if not entry.url in urllist: 
-            print("  \_{}".format(path))
+            print(" \_{}".format(path))
             if parts.netloc in ['imgur.com','i.imgur.com']:
                 noext = os.path.splitext(parts.path)[0]
                 pieces = noext.strip('/').split('/')
@@ -167,14 +167,14 @@ for who in all:
                     ext = os.path.splitext(url_to_get)[1]
                     path += ext
 
-                print("     \_{}".format(url_to_get))
+                print("   \_{}".format(url_to_get))
 
             if parts.netloc == 'gfycat.com':
                 url_path = parts.path.strip('/')
                 try:
                     obj = gfycat.query_gfy(url_path)
                     url_to_get = obj.get('gfyItem').get('mp4Url')
-                    print("     \_{}".format(url_to_get))
+                    print("   \_{}".format(url_to_get))
 
                 except:
                     print("     \_ Unable to get {}".format(entry.url))
