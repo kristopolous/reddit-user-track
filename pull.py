@@ -72,7 +72,7 @@ def cksumcheck(path):
     ihash = str(ihash)
 
     if ihash in cksum and not ( filename in cksum[ihash] or cksum[ihash] in filename ):
-        print("  dupe: {} with {} ".format(filename, cksum.get(ihash)))
+        print("   dupe: {} with {} ".format(filename, cksum.get(ihash)))
         ignore.add(path)
         os.unlink(path)
     else:
@@ -101,7 +101,7 @@ for who in all:
             cksumcheck(path)
 
     if who in fail:
-        print("Skipping {}".format(who))
+        print(" Skipping {}".format(who))
         continue
 
     urllist = set()
@@ -144,7 +144,7 @@ for who in all:
            path += '.mp4'
 
         if not entry.url in urllist: 
-            print(" --> {}".format(path))
+            print("  \_{}".format(path))
             if parts.netloc in ['imgur.com','i.imgur.com']:
                 noext = os.path.splitext(parts.path)[0]
                 pieces = noext.strip('/').split('/')
