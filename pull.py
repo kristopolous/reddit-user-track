@@ -177,7 +177,7 @@ for who in all:
                     print("   \_{}".format(url_to_get))
 
                 except:
-                    print("     \_ Unable to get {}".format(entry.url))
+                    print("   \_ Unable to get {}".format(entry.url))
                     ignore.add(path)
                     continue
 

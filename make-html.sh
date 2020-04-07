@@ -5,7 +5,7 @@
 a { text-decoration: none; color: #aac }
 a:hover { color: #99f}
 body { font-size:0;margin: 0; padding: 0; background: black; }
-img { width: 33.3% }
+video,img { width: 33.3% }
 div.wrap { width: 97% }
 div.inner {max-height:60rem;overflow-y:auto;border-bottom:3px solid #777 }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
@@ -35,7 +35,7 @@ for dir in $list; do
           ext="${i##*.}"
           if [[ $ext == 'mp4' ]]; then
             cat << ENDL
-              <video autoplay loop muted="" nocontrols>
+              <video class=video autoplay loop muted="" nocontrols>
                 <source src="$i">
               </video>
 ENDL
