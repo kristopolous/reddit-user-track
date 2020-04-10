@@ -200,8 +200,8 @@ for who in all:
 
         if os.path.exists(path):
             cksumcheck(path)
-        else:
-            print(" !! {}".format(path))
+        #else:
+        #    print(" !! {}".format(path))
 
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
