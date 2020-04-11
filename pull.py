@@ -72,7 +72,7 @@ def cksumcheck(path):
     ihash = str(ihash)
 
     if ihash in cksum and not ( filename in cksum[ihash] or cksum[ihash] in filename ):
-        print("   dupe: {} with {} ".format(filename, cksum.get(ihash)))
+        print("   == {} is {} ".format(filename, cksum.get(ihash)))
         ignore.add(path)
         os.unlink(path)
     else:
