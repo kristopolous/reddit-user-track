@@ -89,10 +89,10 @@ for who in all:
     content = "data/{}".format(who)
 
     if not os.path.exists(content):
-        print(" /{} (Making dir)".format(content))
+        print(" /{} (Making dir)".format(who))
         os.mkdir(content)
     else:
-        print(" /{}".format(content))
+        print(" /{}".format(who))
 
     cksum_seen = list(cksum.values())
     for path in glob("{}/*[jp][np]g".format(content)):
