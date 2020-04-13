@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-from glob import glob
 import praw
 import os
-import urllib
-from urllib.parse import urlparse
 import secrets
-import json
 import sys
-import inspect
 
 reddit = praw.Reddit(
     client_id=secrets.reddit['id'], 
@@ -22,14 +17,16 @@ def lf(path):
             return sorted(list(set([x[1].strip('/\n ') for x in enumerate(fp)])), key=str.casefold)
     return []
 
-print(set(lf('ignore.txt')))
-all = set(lf('banlist.txt') + lf('userlist.txt')) - set(lf('ignore.txt'))
+blocked = lf('blocked.txt')
+all = set(lf('banlist.txt') + lf('userlist.txt')) - set(lf('fail.txt') + blocked)
 
-sys.exit(0)
-for who in list(all):
+for who in sorted(list(all)):
     print(who)
     try:
         reddit.redditor(who).block()
+        blocked.append(who)
     except:
         print("hrmm ... can't find {}".format(who))
 
+with open('blocked.txt', 'w') as f:
+    f.write('\n'.join(list(blocked)))
