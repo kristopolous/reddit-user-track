@@ -1,14 +1,13 @@
 #!/usr/bin/zsh
-my_path="."
-args="-mindepth 1"
+my_path="data/"
+args=
 if [[ -d "data/$1" ]]; then 
   echo "using $1"
-  my_path="$1" 
-  args=
+  my_path="data/$1" 
 elif [[ -n "$1" ]]; then 
-  args="$args -and -ctime -$1"
+  args=" -ctime -$1"
 fi
-list=$(find data/$my_path -type d -and -not -path "*/.git*" | sort )
+list=($(find $my_path -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
 {
   cat << ENDL
 <style>
@@ -27,7 +26,7 @@ ENDL
 
 for dir in $list; do
   if [ -n "$args" ]; then
-    sublist=$( find $dir \( -name \*.jpg -or -name \*.mp4 -or -name \*.gif -or -name \*.png \) $args )
+    sublist=($( /usr/bin/find $dir ${=args} | grep -E "(jpe?g|png|gif|mp4)" ))
   else
     sublist=($dir/**/*(jpg|mp4|gif|png|jpeg)(om))
   fi
