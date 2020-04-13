@@ -2,7 +2,6 @@
 import praw
 import os
 import secrets
-import sys
 
 reddit = praw.Reddit(
     client_id=secrets.reddit['block']['id'], 
