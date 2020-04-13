@@ -29,7 +29,7 @@ for dir in $list; do
   if [ -n "$args" ]; then
     sublist=$( find $dir \( -name \*.jpg -or -name \*.mp4 -or -name \*.gif -or -name \*.png \) $args )
   else
-    sublist=($dir/**/*(jpg|mp4|gif|png|jpeg)(om[1,10]))
+    sublist=($dir/**/*(jpg|mp4|gif|png|jpeg)(om))
   fi
 
   if [ -n "$sublist" ]; then
