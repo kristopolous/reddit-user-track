@@ -16,10 +16,10 @@ from gfycat.client import GfycatClient
 from imgurpython import ImgurClient
 
 reddit = praw.Reddit(
-    client_id=secrets.reddit['id'], 
-    client_secret=secrets.reddit['secret'], 
-    password=secrets.reddit['password'], user_agent='test', 
-    username=secrets.reddit['username']
+    client_id=secrets.reddit['pull']['id'], 
+    client_secret=secrets.reddit['pull']['secret'], 
+    password=secrets.reddit['pull']['password'], user_agent='test', 
+    username=secrets.reddit['pull']['username']
 )
 
 gfycat = GfycatClient(

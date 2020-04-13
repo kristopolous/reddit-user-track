@@ -5,10 +5,10 @@ import secrets
 import sys
 
 reddit = praw.Reddit(
-    client_id=secrets.reddit['id'], 
-    client_secret=secrets.reddit['secret'], 
-    password=secrets.reddit['password'], user_agent='test', 
-    username=secrets.reddit['username']
+    client_id=secrets.reddit['block']['id'], 
+    client_secret=secrets.reddit['block']['secret'], 
+    password=secrets.reddit['block']['password'], user_agent='test', 
+    username=secrets.reddit['block']['username']
 )
 
 def lf(path):
