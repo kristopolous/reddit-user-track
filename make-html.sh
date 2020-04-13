@@ -1,14 +1,14 @@
-#!/bin/bash
-path="."
+#!/usr/bin/zsh
+my_path="."
 args="-mindepth 1"
 if [[ -d "data/$1" ]]; then 
   echo "using $1"
-  path="$1" 
+  my_path="$1" 
   args=
 elif [[ -n "$1" ]]; then 
   args="$args -and -ctime -$1"
 fi
-list=$(find data/$path -type d -and -not -path "*/.git*" | sort )
+list=$(find data/$my_path -type d -and -not -path "*/.git*" | sort )
 {
   cat << ENDL
 <style>
@@ -26,7 +26,12 @@ div.inner.show { background: #333; margin-bottom: 0; }
 ENDL
 
 for dir in $list; do
-  sublist=$( find $dir \( -name \*.jpg -or -name \*.mp4 -or -name \*.gif -or -name \*.png \) $args )
+  if [ -n "$args" ]; then
+    sublist=$( find $dir \( -name \*.jpg -or -name \*.mp4 -or -name \*.gif -or -name \*.png \) $args )
+  else
+    sublist=($dir/**/*(jpg|mp4|gif|png|jpeg)(om[1,10]))
+  fi
+
   if [ -n "$sublist" ]; then
     echo "<div class=wrap>"
       user=$(basename $dir)
