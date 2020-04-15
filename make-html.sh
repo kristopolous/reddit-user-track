@@ -1,13 +1,15 @@
 #!/usr/bin/zsh
 my_path="data/"
+arg_first=
 args=
 if [[ -d "data/$1" ]]; then 
   echo "using $1"
   my_path="data/$1" 
 elif [[ -n "$1" ]]; then 
+  arg_first="-mindepth 1"
   args=" -ctime -$1"
 fi
-list=($(find $my_path -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
+list=($(find $my_path ${=arg_first} -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
 {
   cat << ENDL
 <style>
