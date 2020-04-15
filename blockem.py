@@ -19,7 +19,7 @@ def lf(path):
 blocked = lf('blocked.txt')
 all = set(lf('banlist.txt') + lf('userlist.txt')) - set(lf('fail.txt') + blocked)
 
-for who in sorted(list(all)):
+for who in all:
     print(who)
     try:
         reddit.redditor(who).block()
