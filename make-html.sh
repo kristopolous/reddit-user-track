@@ -2,11 +2,17 @@
 my_path="data/"
 arg_first=
 args=
+all=
 if [[ -d "data/$1" ]]; then 
+  all=1
   echo "using $1"
   my_path="data/$1" 
 elif [[ -n "$1" ]]; then 
   arg_first="-mindepth 1"
+  if [[ "$2" == "all" ]]; then 
+    all=1
+    arg_first="-maxdepth 0" 
+  fi
   args=" -ctime -$1"
 fi
 list=($(find $my_path ${=arg_first} -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
@@ -20,7 +26,7 @@ video,img { width: 33.3% }
 div.wrap { width: 97% }
 div.inner {max-height:60rem;overflow-y:auto;border-bottom:3px solid #777 }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
-.show img { display: none }
+.show img, .show video{ display: none }
 div.inner.show { background: #333; margin-bottom: 0; }
 </style>
 <script src=remember.js></script>
@@ -34,10 +40,10 @@ for dir in $list; do
   fi
 
   if [ -n "$sublist" ]; then
-    echo "<div class=wrap>"
+    echo "<div class=wrap$all>"
       user=$(basename $dir)
       echo "<span><a href=https://old.reddit.com/u/$user>$user</a></span>"
-      echo "<div class=inner onclick=\"this.classList.toggle('show')\">"
+      [[ -z $all ]] && echo "<div class=inner onclick=\"this.classList.toggle('show')\">"
         for i in $sublist; do
           #(identify -format "%[fx:w/h] %f\n" $sublist | sort -n | awk ' { print $2 } ' | uniq ); do
           ext="${i##*.}"
@@ -51,7 +57,7 @@ ENDL
             echo "<img title="$i" src="$i">"
           fi
         done
-      echo "</div>"
+      [[ -z $all ]] && echo "</div>"
     echo "</div>"
   fi
 done
