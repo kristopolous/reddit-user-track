@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-from glob import glob
 import praw
 import os
 import urllib
-from urllib.parse import urlparse
 import secrets
 import json
 import sys
 import pdb
 import hashlib
-import inspect
-from PIL import Image
 import imagehash
+from glob import glob
+from PIL import Image
+from urllib.parse import urlparse
 from gfycat.client import GfycatClient
 from imgurpython import ImgurClient
 
@@ -200,17 +199,13 @@ for who in all:
 
         if os.path.exists(path):
             cksumcheck(path)
-        #else:
-        #    print(" !! {}".format(path))
 
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
 
-with open('fail.txt', 'w') as f:
-    f.write('\n'.join(list(fail)))
-
-with open('ignore.txt', 'w') as f:
-    f.write('\n'.join(list(ignore)))
+for i in ['fail', 'ignore']:
+    with open(i + '.txt', 'w') as f:
+        f.write('\n'.join(list(globals().get(i))))
 
 with open('cksum.json', 'w') as f:
     json.dump(cksum, f)
