@@ -9,11 +9,15 @@ if [[ -d "data/$1" ]]; then
   my_path="data/$1" 
 elif [[ -n "$1" ]]; then 
   arg_first="-mindepth 1"
-  if [[ "$2" == "all" ]]; then 
-    all=1
-    arg_first="-maxdepth 0" 
-  fi
   args=" -ctime -$1"
+  if [[ -n "$2" ]]; then
+    if [[ "$2" == "all" ]]; then 
+      all=1
+      arg_first="-maxdepth 0" 
+    else
+      args="$args ! -ctime -$2"
+    fi
+  fi
 fi
 list=($(find $my_path ${=arg_first} -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
 {
