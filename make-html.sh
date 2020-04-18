@@ -65,7 +65,7 @@ for dir in $list; do
           if [[ $ext == 'mp4' ]]; then
             cat << ENDL
               <video class=video autoplay loop muted="" nocontrols>
-                <source data-src="$i">
+                <source src="$i">
               </video>
 ENDL
           else

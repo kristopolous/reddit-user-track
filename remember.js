@@ -26,7 +26,9 @@ window.onload = function() {
     r.addEventListener('mouseleave', e => {
       Array.from(e.target.querySelectorAll('img,source'))
         .forEach( r => {
-          r.removeAttribute('src');
+          if(r.dataset.src) {
+            r.removeAttribute('src');
+          }
         });
       e.target.classList.remove('show');
     })
