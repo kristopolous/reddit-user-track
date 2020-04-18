@@ -27,7 +27,10 @@ if [[ -n "$1" ]]; then
       fi
     fi
   fi
+else
+  arg_first="-mindepth 1"
 fi
+
 list=($(find ${=my_path} ${=arg_first} -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
 {
   cat << ENDL
