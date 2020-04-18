@@ -35,12 +35,12 @@ list=($(find ${=my_path} ${=arg_first} -type d -and -not -path "*/.git*" -and -n
 {
   cat << ENDL
 <style>
-a { text-decoration: none; color: #aac }
+a { cursor: pointer; text-decoration: none; color: #aac }
 a:hover { color: #99f }
 body { font-size:0;margin: 0; padding: 0; background: black; }
 video,img { width: 33.3%; visibility: hidden; }
 div.wrap { width: 97% }
-div.inner {max-height:60rem;overflow-y:auto;border-bottom:3px solid #777 }
+div.inner {height:30rem;overflow-y:auto;border-bottom:3px solid #777 }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
 .show img, .show video {visibility: visible }
 </style>
@@ -55,9 +55,9 @@ for dir in $list; do
   fi
 
   if [ -n "$sublist" ]; then
-    echo "<div class=wrap$all>"
-      user=$(basename $dir)
-      echo "<span><a href=https://old.reddit.com/u/$user>$user</a></span>"
+    user=$(basename $dir)
+    echo "<div data-user='$user' class='cont wrap$all'>"
+      echo "<span class=user></span>"
       [[ -z $all ]] && echo "<div class=inner>"
         for i in $sublist; do
           #(identify -format "%[fx:w/h] %f\n" $sublist | sort -n | awk ' { print $2 } ' | uniq ); do
