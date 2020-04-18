@@ -3,10 +3,17 @@ my_path="data/"
 arg_first=
 args=
 all=
+
 if [[ -d "data/$1" ]]; then 
+  my_path=
   all=1
-  echo "using $1"
-  my_path="data/$1" 
+  while [[ -d "data/$1" ]]; do
+    my_path="$my_path data/$1" 
+    echo "using $1"
+    shift
+    [[ -z "$1" ]] && break
+    all=
+  done
 elif [[ -n "$1" ]]; then 
   arg_first="-mindepth 1"
   args=" -ctime -$1"
@@ -19,7 +26,7 @@ elif [[ -n "$1" ]]; then
     fi
   fi
 fi
-list=($(find $my_path ${=arg_first} -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
+list=($(find ${=my_path} ${=arg_first} -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
 {
   cat << ENDL
 <style>
@@ -37,7 +44,7 @@ div.inner.show { background: #333; margin-bottom: 0; }
 ENDL
 
 for dir in $list; do
-  if [ -n "$args" ]; then
+  if [[ -z "$single" ]]; then
     sublist=($( /usr/bin/find $dir ${=args} | grep -E "(jpe?g|png|gif|mp4)" ))
   else
     sublist=($dir/**/*(jpg|mp4|gif|png|jpeg)(om))
