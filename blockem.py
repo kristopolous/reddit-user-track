@@ -16,8 +16,11 @@ def lf(path):
             return sorted(list(set([x[1].strip('/\n ') for x in enumerate(fp)])), key=str.casefold)
     return []
 
+current_blocked = set(lf('banlist.txt') + lf('userlist.txt')) 
 blocked = lf('blocked.txt')
-all = set(lf('banlist.txt') + lf('userlist.txt')) - set(lf('fail.txt') + blocked)
+all = current_blocked - set(lf('fail.txt') + blocked)
+
+print("Total: {}".format(len(current_blocked)))
 
 for who in all:
     print(who)
