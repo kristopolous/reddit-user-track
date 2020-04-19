@@ -87,21 +87,23 @@ else:
 for who in all:
     content = "data/{}".format(who)
 
+    cksum_seen = list(cksum.values())
+    if os.path.exists(content):
+        for path in glob("{}/*[jp][np]g".format(content)):
+            filename = os.path.basename(path)
+            if filename not in cksum_seen:
+                cksumcheck(path)
+
+    if who in fail:
+        print(" -- {}".format(who))
+        continue
+
     if not os.path.exists(content):
         print(" /{} (Making dir)".format(who))
         os.mkdir(content)
     else:
         print(" /{}".format(who))
 
-    cksum_seen = list(cksum.values())
-    for path in glob("{}/*[jp][np]g".format(content)):
-        filename = os.path.basename(path)
-        if filename not in cksum_seen:
-            cksumcheck(path)
-
-    if who in fail:
-        print(" Skipping {}".format(who))
-        continue
 
     urllist = set()
     if os.path.exists("{}/urllist.txt".format(content)):
