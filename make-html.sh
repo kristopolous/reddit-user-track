@@ -37,10 +37,10 @@ list=($(find ${=my_path} ${=arg_first} -type d -and -not -path "*/.git*" -and -n
 <style>
 a { cursor: pointer; text-decoration: none; color: #aac }
 a:hover { color: #99f }
-body { font-size:0;margin: 0; padding: 0; background: black; }
-video,img { width: 33.3%; visibility: hidden; }
+body { font-size:0; margin: 0; padding: 0; background: black; }
+video,img { vertical-align: top; width: 33.3%; visibility: hidden; }
 div.wrap { width: 97% }
-div.inner {height:30rem;overflow-y:auto;border-bottom:3px solid #777 }
+div.inner {height:30rem; overflow-y:auto;border-bottom:3px solid #777 }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
 .show img, .show video {visibility: visible }
 </style>
