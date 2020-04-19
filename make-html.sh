@@ -32,6 +32,7 @@ else
 fi
 
 list=($(find ${=my_path} ${=arg_first} -type d -and -not -path "*/.git*" -and -not -path "*__pycache__*" | sort ))
+count=0
 {
   cat << ENDL
 <style>
@@ -71,6 +72,7 @@ ENDL
           else
             echo "<img title="$i" data-src="$i">"
           fi
+          (( count++ ))
         done
       [[ -z $all ]] && echo "</div>"
     echo "</div>"
@@ -78,3 +80,4 @@ ENDL
 done
 
 } > index.html
+echo "$count assets"
