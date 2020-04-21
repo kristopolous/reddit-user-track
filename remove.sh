@@ -7,5 +7,6 @@ fi
 echo $1 >> banlist.txt
 sort banlist.txt | uniq > /tmp/blist
 mv /tmp/blist banlist.txt
+./blockem.py
 
 #./make-html.sh
