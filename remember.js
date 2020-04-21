@@ -23,7 +23,7 @@ function show(p) {
 }
 
 window.onload = function() {
-  if (document.querySelectorAll('img,source').length < 200) {
+  if (document.querySelectorAll('img,source').length < 400) {
     show(document.body);
   } else {
     document.querySelectorAll(".inner").forEach( r => {
