@@ -31,6 +31,7 @@ imgur = ImgurClient(
     secrets.imgur['secret']
 )
 
+subredMap = {}
 
 def lf(path, kind = 'set'):
     if os.path.exists(path):
@@ -124,6 +125,12 @@ for who in all:
         continue
 
     for entry in submissions:
+        subred = entry.subreddit.display_name
+        if not subred in subredMap:
+            subredMap[subred] = 0
+
+        subredMap[subred] += 1
+
         try:
             filename = os.path.basename(entry.url)
         except:
@@ -202,12 +209,16 @@ for who in all:
         if os.path.exists(path):
             cksumcheck(path)
 
+    with open('subreddits.json', 'w') as f:
+        json.dump(subredMap, f)
+
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
 
 for i in ['fail', 'ignore']:
     with open(i + '.txt', 'w') as f:
         f.write('\n'.join(list(globals().get(i))))
+
 
 with open('cksum.json', 'w') as f:
     json.dump(cksum, f)
