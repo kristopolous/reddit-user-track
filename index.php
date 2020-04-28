@@ -14,7 +14,8 @@ foreach(glob("data/*") as $user) {
     $when = filemtime($f);
     if($now - $when < 86400 / 2) {
       if($is_first) {
-        echo "<div data-user='$user' class='cont wrap'>";
+        $user_short = basename($user);
+        echo "<div data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
         echo "<div class=inner>";
         $is_first = false;
