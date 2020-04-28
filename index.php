@@ -31,11 +31,7 @@ foreach(glob("data/*") as $user) {
       }
       $what = pathinfo($f);
       if($what['extension'] == 'mp4') {
-        ?>
-          <video class=video autoplay loop muted="" nocontrols>
-          <source src=<?=$f?>>
-          </video>
-        <?
+        echo "<video class=video autoplay loop muted='' nocontrols><source src='$f'></video>";
       } else {
         echo "<img title='$fname' data-src='$f'>";
       }
