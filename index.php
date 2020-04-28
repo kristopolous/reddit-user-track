@@ -9,15 +9,20 @@ foreach(glob("data/*") as $user) {
   $is_first = true;
   $user_short = basename($user);
   $row = [];
+  $count = 0;
   foreach(glob("$user/*.*") as $f) {
     $fname =basename($f);
-    $row[] = $fname;
     if ($fname == 'urllist.txt') {
       continue;
     }
+    $row[] = $fname;
     
     $when = filemtime($f);
-    if($now - $when < 86400 / 2) {
+    if($now - $when < 86400*60 ) {
+      $count ++;
+      if($count > 3) {
+        continue;
+      }
       if($is_first) {
         echo "<div data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
@@ -32,7 +37,7 @@ foreach(glob("data/*") as $user) {
           </video>
         <?
       } else {
-        echo "<img title='$f' data-src='$f'>";
+        echo "<img title='$fname' data-src='$f'>";
       }
     }
   }

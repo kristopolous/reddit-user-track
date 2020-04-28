@@ -1,3 +1,29 @@
+function showall(who,el) {
+  if(who in showall) {
+    return;
+  }
+  var handler = el.parentNode.parentNode.querySelector('.inner');
+  handler.innerHTML = '';
+  let content = [];
+  for(let asset of all[who]) {
+    let html = '';
+    console.log(asset);
+    let ext = asset.split('.').pop();
+    if(ext == 'mp4') {
+      html = ` 
+        <video class=video autoplay loop muted="" nocontrols>
+        <source src=data/${who}/${asset}>
+        </video>
+        `;
+    } else {
+      html = `<img src=data/${who}/${asset}>`;
+    }
+    content.push(html);
+  }
+  handler.classList.add('all');
+  handler.innerHTML = content.join('');
+}
+
 function vote(who, dir) {
   var record = JSON.parse(localStorage['ballot'] || '{}');
   if(who) {
@@ -46,7 +72,7 @@ window.onload = function() {
        controls = r.querySelector('.user'), 
        count = vote(user);
      
-     controls.innerHTML = `<a href=https://old.reddit.com/u/${user}>${user}</a>
+     controls.innerHTML = `<a onclick=showall("${user}",this)>${user}</a>
        <b>${count}</b>
        <a onclick=vote("${user}",1)>&#9650;</a> - 
        <a onclick=vote("${user}",-1)>&#9660;</a> 
