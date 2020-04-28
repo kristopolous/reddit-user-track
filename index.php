@@ -4,17 +4,21 @@
 <?php
 
 $now = time();
+$res = [];
 foreach(glob("data/*") as $user) {
   $is_first = true;
+  $user_short = basename($user);
+  $row = [];
   foreach(glob("$user/*.*") as $f) {
-    if (basename($f) == 'urllist.txt') {
+    $fname =basename($f);
+    $row[] = $fname;
+    if ($fname == 'urllist.txt') {
       continue;
     }
     
     $when = filemtime($f);
     if($now - $when < 86400 / 2) {
       if($is_first) {
-        $user_short = basename($user);
         echo "<div data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
         echo "<div class=inner>";
@@ -32,8 +36,13 @@ foreach(glob("data/*") as $user) {
       }
     }
   }
+  $res[$user_short] = $row;
   if(!$is_first) { 
     echo "</div>";
     echo "</div>";
   }
 }
+?>
+<script>
+  var all = <?=json_encode($res);?>
+</script>
