@@ -1,5 +1,8 @@
 a { cursor: pointer; text-decoration: none; color: #aac }
 a:hover { color: #99f }
+#links { font-size: 18px }
+#links a { display: inline-block; padding: 0.5rem 1rem }
+#links a:hover { background: #aac; color: #000 }
 body { font-size:0; margin: 0; padding: 0; background: black; }
 video,img { vertical-align: top; width: 33.3%; visibility: hidden; }
 div.wrap { width: 97% }

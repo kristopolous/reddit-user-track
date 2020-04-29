@@ -1,10 +1,25 @@
 <!doctype html5>
-<link rel=stylesheet href=style.css />
-<script src=remember.js></script>
+<link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
 <?php
+foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
+  if ($t > 48) {
+    if ($t > 24 * 14) {
+      $unit = $t / (24 * 7) . " week";
+    } else {
+      $unit = $t / 24 . " day";
+    }
+  } else {
+    $unit = "$t hour";
+  }
+  echo "<a href='?last=$t'>$unit</a>";
+}
+echo "</div>";
+
+$last = $_GET['last'] ?: 24 * 60;
 
 $now = time();
 $res = [];
+
 foreach(glob("data/*") as $user) {
   $is_first = true;
   $user_short = basename($user);
@@ -18,7 +33,7 @@ foreach(glob("data/*") as $user) {
     $row[] = $fname;
     
     $when = filemtime($f);
-    if($now - $when < 86400*60 ) {
+    if($now - $when < 3600*$last ) {
       $count ++;
       if($count > 3) {
         continue;
