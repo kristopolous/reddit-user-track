@@ -45,7 +45,7 @@ def lf(path, kind = 'set'):
             return set(fp.read().splitlines())
 
 ignore = lf('ignore.txt') or set()
-fail = lf('fail.txt') or set()
+fail = lf('fail.json', 'json') or {}
 cksum = lf('cksum.json', 'json') or {}
 
 def cksumcheck(path):
@@ -95,7 +95,7 @@ for who in all:
             if filename not in cksum_seen:
                 cksumcheck(path)
 
-    if who in fail:
+    if fail.get(who) and fail.get(who) > 3:
         print(" -- {}".format(who))
         continue
 
@@ -119,9 +119,14 @@ for who in all:
 
     try:
         submissions = list(submissions)
+        if who in fail:
+            del(fail[who])
+
     except:
         print("Woops, no submissions {}".format(who))
-        fail.add(who)
+        if who in fail:
+            fail[who] += 1
+
         continue
 
     for entry in submissions:
@@ -215,10 +220,11 @@ for who in all:
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
 
-for i in ['fail', 'ignore']:
+for i in ['ignore']:
     with open(i + '.txt', 'w') as f:
         f.write('\n'.join(list(globals().get(i))))
 
 
-with open('cksum.json', 'w') as f:
-    json.dump(cksum, f)
+for i in ['fail', 'cksum']:
+    with open(i + '.json', 'w') as f:
+        json.dump(globals().get(i), f)

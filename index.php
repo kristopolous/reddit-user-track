@@ -1,7 +1,7 @@
 <!doctype html5>
 <link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
 <?php
-$last = $_GET['last'] ?: 24 * 60;
+$last = $_GET['last'] ?: 24 * 6000;
 
 foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
   if ($t > 48) {
@@ -17,6 +17,7 @@ foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
   $klass = ($last == $t) ? 'class=active' : '';
   echo "<a $klass href='?last=$t'>$unit</a>";
 }
+ echo "<a href='?'>all</a>";
 echo "</div>";
 
 $now = time();
