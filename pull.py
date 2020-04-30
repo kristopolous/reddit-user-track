@@ -123,10 +123,11 @@ for who in all:
             del(fail[who])
 
     except:
-        print("Woops, no submissions {}".format(who))
-        if who in fail:
-            fail[who] += 1
+        if not who in fail:
+            fail[who] = 0
+        fail[who] += 1
 
+        print("Woops, no submissions {} ({})".format(who, fail[who]))
         continue
 
     for entry in submissions:
