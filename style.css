@@ -11,3 +11,7 @@ div.inner {height:45rem; overflow-y:auto }
 div.inner.all {height:95rem }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
 .show img, .show video {visibility: visible }
+@media only screen and (max-width: 768px){
+  video,img { vertical-align: top; width: 50%; visibility: hidden; }
+  div.inner {height:30rem }
+}

@@ -1,7 +1,8 @@
 <!doctype html5>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
 <?php
-$last = $_GET['last'] ?: 24 * 6000;
+$last = $_GET['last'] ?: 4;
 
 foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
   if ($t > 48) {
