@@ -4,6 +4,7 @@
 <?php
 $last = $_GET['last'] ?: 4;
 
+
 foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
   if ($t > 48) {
     if ($t > 24 * 14) {
@@ -18,7 +19,12 @@ foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
   $klass = ($last == $t) ? 'class=active' : '';
   echo "<a $klass href='?last=$t'>$unit</a>";
 }
- echo "<a href='?'>all</a>";
+$klass = '';
+if($last == 'all') { 
+  $klass = 'class=active';
+  $last = 25 * 365 * 20;
+}
+echo "<a $klass href='?last=all'>all</a>";
 echo "</div>";
 
 $now = time();
@@ -42,7 +48,7 @@ foreach(glob("data/*") as $user) {
     $when = filemtime($f);
     if($now - $when < 3600*$last ) {
       $count ++;
-      if($count > 3) {
+      if($count > 2) {
         continue;
       }
       if($is_first) {
