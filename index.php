@@ -29,7 +29,10 @@ foreach(glob("data/*") as $user) {
   $user_short = basename($user);
   $row = [];
   $count = 0;
-  foreach(glob("$user/*.*") as $f) {
+  $list = glob("$user/*.*");
+  usort($list, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
+  foreach($list as $f) {
+
     $fname =basename($f);
     if ($fname == 'urllist.txt') {
       continue;
