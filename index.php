@@ -2,6 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
 <?php
+$use_fail = isset($_GET['fail']);
 $last = $_GET['last'] ?: 4;
 
 
@@ -29,10 +30,19 @@ echo "</div>";
 
 $now = time();
 $res = [];
+$filter = false;
+
+if($use_fail) {
+  $filter = array_keys(json_decode(file_get_contents('fail.json'), true));
+}
 
 foreach(glob("data/*") as $user) {
   $is_first = true;
   $user_short = basename($user);
+  if($filter && !in_array($user_short, $filter)) {
+    continue;
+  }
+
   $row = [];
   $count = 0;
   $list = glob("$user/*.*");
@@ -46,7 +56,7 @@ foreach(glob("data/*") as $user) {
     $row[] = $fname;
     
     $when = filemtime($f);
-    if($now - $when < 3600*$last ) {
+    if($now - $when < 3600*$last  || $filter) {
       $count ++;
       if($count > 2) {
         continue;
