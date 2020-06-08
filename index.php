@@ -68,7 +68,7 @@ foreach(glob("data/*") as $user) {
         $is_first = false;
       }
       $what = pathinfo($f);
-      if($what['extension'] == 'mp4') {
+      if($what['extension'] == 'mp4' || $what['extension'] == 'gifv') {
         echo "<video class=video autoplay loop muted='' nocontrols><source src='$f'></video>";
       } else {
         echo "<img title='$fname' data-src='$f'>";

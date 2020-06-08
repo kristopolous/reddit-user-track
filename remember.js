@@ -9,7 +9,7 @@ function showall(who,el) {
     let html = '';
     console.log(asset);
     let ext = asset.split('.').pop();
-    if(ext == 'mp4') {
+    if(ext == 'mp4' || ext == 'gifv') {
       html = ` 
         <video class=video autoplay loop muted="" nocontrols>
         <source src=data/${who}/${asset}>
