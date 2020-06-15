@@ -4,6 +4,10 @@
 <?php
 $use_fail = isset($_GET['fail']);
 $last = $_GET['last'] ?: 4;
+$userList = $_GET['users'];
+if(!empty($userList)) {
+  $last = 'all';
+}
 
 
 foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
@@ -36,7 +40,16 @@ if($use_fail) {
   $filter = array_keys(json_decode(file_get_contents('fail.json'), true));
 }
 
-foreach(glob("data/*") as $user) {
+if(isset($userList)) {
+  $toShow = array_map(function($res) { 
+    return "data/" . $res;
+  }, explode(',',$userList));
+  var_dump($toShow, $userList);
+} else {
+  $toShow = glob("data/*");
+}
+
+foreach($toShow as $user) {
   $is_first = true;
   $user_short = basename($user);
   if($filter && !in_array($user_short, $filter)) {
