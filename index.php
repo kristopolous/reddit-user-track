@@ -88,8 +88,8 @@ foreach($toShow as $user) {
       }
     }
   }
-  $res[$user_short] = $row;
   if(!$is_first) { 
+    $res[$user_short] = $row;
     echo "</div>";
     echo "</div>";
   }
