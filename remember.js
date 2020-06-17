@@ -12,11 +12,11 @@ function showall(who,el) {
     if(ext == 'mp4' || ext == 'gifv') {
       html = ` 
         <video class=video autoplay loop muted="" nocontrols>
-        <source src=data/${who}/${asset}>
+        <source src="data/${who}/${asset}">
         </video>
         `;
     } else {
-      html = `<img src=data/${who}/${asset}>`;
+      html = `<img src="data/${who}/${asset}">`;
     }
     content.push(html);
   }
