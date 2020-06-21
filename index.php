@@ -63,7 +63,7 @@ foreach($toShow as $user) {
   foreach($list as $f) {
 
     $fname =basename($f);
-    if ($fname == 'urllist.txt') {
+    if ($fname == 'urllist.txt' || $fname == 'donelist.txt') {
       continue;
     }
     $row[] = $fname;
