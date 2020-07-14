@@ -62,14 +62,14 @@ foreach($toShow as $user) {
   usort($list, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
   foreach($list as $f) {
 
-    $fname =basename($f);
+    $fname = basename($f);
     if ($fname == 'urllist.txt' || $fname == 'donelist.txt') {
       continue;
     }
     $row[] = $fname;
     
     $when = filemtime($f);
-    if($now - $when < 3600*$last  || $filter) {
+    if($now - $when < 3600 * $last || $filter) {
       $count ++;
       if($count > 2) {
         continue;
