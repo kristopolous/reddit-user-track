@@ -69,6 +69,8 @@ window.onload = function() {
   document.querySelectorAll(".cont").forEach( r => {
      let 
        user = r.dataset.user,
+       last = r.dataset.last,
+       days = Math.floor(last / 24),
        controls = r.querySelector('.user'), 
        count = vote(user);
      
@@ -76,6 +78,7 @@ window.onload = function() {
        <b>${count}</b>
        <a onclick=vote("${user}",1)>&#9650;</a> - 
        <a onclick=vote("${user}",-1)>&#9660;</a> 
+       ${last} ( ${days} )
      `;
 
      content.push([count, r]);

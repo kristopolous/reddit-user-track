@@ -4,6 +4,9 @@
 <?php
 $use_fail = isset($_GET['fail']);
 $last = $_GET['last'] ?: 4;
+$newest = $_GET['newest'] ?: 0;
+$max = $_GET['max'] ?: PHP_INT_MAX;
+$min = $_GET['min'] ?: 0;
 $userList = $_GET['users'];
 if(!empty($userList)) {
   $last = 'all';
@@ -27,7 +30,9 @@ foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
 $klass = '';
 if($last == 'all') { 
   $klass = 'class=active';
-  $last = 25 * 365 * 20;
+  if(empty($_GET['last'])) { 
+    $last = 24 * 365 * 20;
+  }
 }
 echo "<a $klass href='?last=all'>all</a>";
 echo "</div>";
@@ -60,6 +65,9 @@ foreach($toShow as $user) {
   $count = 0;
   $list = glob("$user/*.*");
   usort($list, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
+  if ($min > count($list) || count($list) > $max ) {
+    continue;
+  }
   foreach($list as $f) {
 
     $fname = basename($f);
@@ -69,15 +77,15 @@ foreach($toShow as $user) {
     $row[] = $fname;
     
     $when = filemtime($f);
-    if($now - $when < 3600 * $last || $filter) {
+    if(($now - $when < 3600 * $last  && $now - $when > 3600 * $newest) || $filter) {
       $count ++;
       if($count > 2) {
         continue;
       }
       if($is_first) {
-        echo "<div data-user='$user_short' class='cont wrap'>";
+        echo "<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
-        echo "<div class=inner>";
+        echo "<div class=inner>" ;
         $is_first = false;
       }
       $what = pathinfo($f);
