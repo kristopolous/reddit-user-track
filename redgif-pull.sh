@@ -12,7 +12,7 @@ for i in data/*; do
     done
 
     for j in $(cat urllist.txt /tmp/newline donelist.txt | grep redgifs | sort | uniq -u); do
-      youtube-dl "$j" && echo "$j" >> donelist.txt
+      youtube-dl -r 40k "$j" && echo "$j" >> donelist.txt
     done
   fi
   cd $start
