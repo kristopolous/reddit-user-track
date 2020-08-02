@@ -5,6 +5,7 @@
 $use_fail = isset($_GET['fail']);
 $last = $_GET['last'] ?: 4;
 $newest = $_GET['newest'] ?: 0;
+$format = $_GET['format'] ?: '*';
 $max = $_GET['max'] ?: PHP_INT_MAX;
 $min = $_GET['min'] ?: 0;
 $userList = $_GET['users'];
@@ -63,7 +64,7 @@ foreach($toShow as $user) {
 
   $row = [];
   $count = 0;
-  $list = glob("$user/*.*");
+  $list = glob("$user/*.$format");
   usort($list, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
   if ($min > count($list) || count($list) > $max ) {
     continue;
