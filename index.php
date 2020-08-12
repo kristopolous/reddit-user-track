@@ -2,6 +2,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
 <?php
+
+include('db.php');
+$db = db();
+
 $use_fail = isset($_GET['fail']);
 $last = $_GET['last'] ?: 4;
 $newest = $_GET['newest'] ?: 0;
@@ -9,6 +13,7 @@ $format = $_GET['format'] ?: '*';
 $max = $_GET['max'] ?: PHP_INT_MAX;
 $min = $_GET['min'] ?: 0;
 $userList = $_GET['users'];
+
 if(!empty($userList)) {
   $last = 'all';
 }
@@ -105,5 +110,5 @@ foreach($toShow as $user) {
 }
 ?>
 <script>
-  var all = <?=json_encode($res);?>
+var all = <?=json_encode($res);?>, db = <?=json_encode($db) ?>;
 </script>

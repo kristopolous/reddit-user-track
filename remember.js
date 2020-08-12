@@ -24,19 +24,19 @@ function showall(who,el) {
   handler.innerHTML = content.join('');
 }
 
-function vote(who, dir) {
-  var record = JSON.parse(localStorage['ballot'] || '{}');
-  if(who) {
-    if(! (who in record) ) {
-      record[who] = 0;
+function vote(who, dir, el) {
+  if (dir) {
+    if(!(who in db)) {
+      db[who] = 0;
     }
-    if(dir) {
-      record[who] += dir;
-    }
-    localStorage['ballot'] = JSON.stringify(record);
-    return record[who];
+    db[who] += dir;
+    fetch(`vote.php?who=${who}&what=${db[who]}`);
+  } 
+  if(el) {
+    el.parentNode.getElementsByTagName('b')[0].innerHTML = db[who];
   }
-  return record;
+
+  return db[who] || 0;
 }
 
 function show(p) {
@@ -76,8 +76,8 @@ window.onload = function() {
      
      controls.innerHTML = `<a onclick=showall("${user}",this)>${user}</a>
        <b>${count}</b>
-       <a onclick=vote("${user}",1)>&#9650;</a> - 
-       <a onclick=vote("${user}",-1)>&#9660;</a> 
+       <a onclick=vote("${user}",1,this)>&#9650;</a> - 
+       <a onclick=vote("${user}",-1,this)>&#9660;</a> 
        ${last} ( ${days} )
      `;
 
@@ -88,3 +88,19 @@ window.onload = function() {
     document.body.appendChild(r[1])
   });
 }
+
+function transform() {
+  var record = JSON.parse(localStorage['ballot'] || '{}'),
+      vals = Object.keys(record);
+
+  if(vals.length) {
+    let who = vals[0];
+    let what = record[who];
+    fetch(`vote.php?who=${who}&what=${what}`).then(() => {
+      delete record[who];
+      localStorage['ballot'] = JSON.stringify(record);
+      transform();
+    });
+  }
+}
+
