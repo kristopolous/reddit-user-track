@@ -50,22 +50,7 @@ function show(p) {
 
 window.onload = function() {
   let cont = document.getElementById('content');
-  if (document.querySelectorAll('img,source').length < 400) {
-    show(document.body);
-  } else {
-    document.querySelectorAll(".inner").forEach( r => {
-      r.addEventListener('mouseenter', e => { show(e.target); })
-      r.addEventListener('mouseleave', e => {
-        Array.from(e.target.querySelectorAll('img,source'))
-          .forEach( r => {
-            if(r.dataset.src) {
-              r.removeAttribute('src');
-            }
-          });
-        e.target.classList.remove('show');
-      })
-    });
-  }
+  show(document.body);
   let content = [];
   document.querySelectorAll(".cont").forEach( r => {
      let 
@@ -88,20 +73,5 @@ window.onload = function() {
   content.sort((b,a) => a[0] - b[0]).forEach(r => {
     cont.appendChild(r[1])
   });
-}
-
-function transform() {
-  var record = JSON.parse(localStorage['ballot'] || '{}'),
-      vals = Object.keys(record);
-
-  if(vals.length) {
-    let who = vals[0];
-    let what = record[who];
-    fetch(`vote.php?who=${who}&what=${what}`).then(() => {
-      delete record[who];
-      localStorage['ballot'] = JSON.stringify(record);
-      transform();
-    });
-  }
 }
 

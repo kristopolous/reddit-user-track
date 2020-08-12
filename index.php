@@ -66,18 +66,23 @@ if($use_fail) {
 }
 
 if(isset($userList)) {
-  $toShow = array_map(function($res) { 
-    return "data/" . $res;
-  }, explode(',',$userList));
-  var_dump($toShow, $userList);
+  $toShow = explode(',',$userList);
 } else {
   $toShow = glob("data/*");
+  $nameList = array_map(function($r) { return substr($r, 5); }, $toShow);
+  foreach($nameList as $k) {
+    if(!array_key_exists($k, $db)) {
+      $db[$k] = 0;
+    }
+  }
+  arsort($db);
+  $toShow = array_keys($db);
 }
 
 $ix = 0;
-foreach($toShow as $user) {
+foreach($toShow as $user_short) {
   $is_first = true;
-  $user_short = basename($user);
+  $user = "data/$user_short";
   if($filter && !in_array($user_short, $filter)) {
     continue;
   }
@@ -120,7 +125,7 @@ foreach($toShow as $user) {
       if($what['extension'] == 'mp4' || $what['extension'] == 'gifv') {
         echo "<video class=video autoplay loop muted='' nocontrols><source src='$f'></video>";
       } else {
-        echo "<img title='$fname' data-src='$f'>";
+        echo "<img data-src='$f'>";
       }
     }
   }
