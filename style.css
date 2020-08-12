@@ -12,6 +12,20 @@ div.inner.all {height:95rem;overflow-y:auto }
 .all video, .all img { width: 33.3%; }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
 .show img, .show video {visibility: visible }
+#paging {
+  color: white;
+  font-size: 14px;
+  text-align: right;
+}
+#paging a {
+  background:  rgba(170,170,204,.5);
+  text-align: center;
+  color: white;
+  display: inline-block;
+  margin: 0 2%;
+  width: 10%;
+}
+
 
 @media only screen and (max-width: 768px){
   .all video,.all img { width: 50%; }

@@ -1,18 +1,31 @@
 <!doctype html5>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
+<link rel=stylesheet href=style.css />
+<script src=remember.js></script>
+<div id=links>
 <?php
 
 include('db.php');
 $db = db();
+$perPage = 30;
 
 $use_fail = isset($_GET['fail']);
-$last = $_GET['last'] ?: 4;
-$newest = $_GET['newest'] ?: 0;
-$format = $_GET['format'] ?: '*';
-$max = $_GET['max'] ?: PHP_INT_MAX;
-$min = $_GET['min'] ?: 0;
-$userList = $_GET['users'];
+$last = $_GET['last'] ?? 4;
+$newest = $_GET['newest'] ?? 0;
+$format = $_GET['format'] ?? '*';
+$max = $_GET['max'] ?? PHP_INT_MAX;
+$min = $_GET['min'] ?? 0;
+$page = $_GET['page'] ?? 0;
+$userList = $_GET['users'] ?? null;
+
+$start = $page * $perPage;
+$end = ($page + 1) * $perPage;
+
+function dolink($k, $v) {
+  $copy = $_GET;
+  $copy[$k] = $v;
+  return "?" . http_build_query($copy);
+}
 
 if(!empty($userList)) {
   $last = 'all';
@@ -31,7 +44,7 @@ foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
   }
   
   $klass = ($last == $t) ? 'class=active' : '';
-  echo "<a $klass href='?last=$t'>$unit</a>";
+  echo "<a $klass href='" . dolink('last', $t) . "'>$unit</a>";
 }
 $klass = '';
 if($last == 'all') { 
@@ -40,8 +53,9 @@ if($last == 'all') {
     $last = 24 * 365 * 20;
   }
 }
-echo "<a $klass href='?last=all'>all</a>";
+echo "<a $klass href='" . dolink('last', 'all') . "'>all</a>";
 echo "</div>";
+echo "<div id=content>";
 
 $now = time();
 $res = [];
@@ -60,6 +74,7 @@ if(isset($userList)) {
   $toShow = glob("data/*");
 }
 
+$ix = 0;
 foreach($toShow as $user) {
   $is_first = true;
   $user_short = basename($user);
@@ -83,9 +98,16 @@ foreach($toShow as $user) {
     $row[] = $fname;
     
     $when = filemtime($f);
-    if(($now - $when < 3600 * $last  && $now - $when > 3600 * $newest) || $filter) {
+    if($last == 'all' || ($now - $when < 3600 * $last  && $now - $when > 3600 * $newest) || $filter) {
+      if($is_first) {
+        $ix ++;
+        if($ix <= $start || $ix > $end) {
+          // don't clear the is_first and we won't add it
+          break;
+        }
+      }
       $count ++;
-      if($count > 2) {
+      if($count > 3) {
         continue;
       }
       if($is_first) {
@@ -108,7 +130,15 @@ foreach($toShow as $user) {
     echo "</div>";
   }
 }
-?>
+echo "</div><div id=paging>";
+if($page > 0) {
+  echo "<a href=" . dolink('page', $page - 1) . ">prev</a>";
+}
+if($ix > $start + $perPage) {
+  echo "<a href=" . dolink('page', $page + 1) . ">next</a>";
+}
+?> 
+</div>
 <script>
 var all = <?=json_encode($res);?>, db = <?=json_encode($db) ?>;
 </script>

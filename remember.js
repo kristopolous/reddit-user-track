@@ -49,6 +49,7 @@ function show(p) {
 }
 
 window.onload = function() {
+  let cont = document.getElementById('content');
   if (document.querySelectorAll('img,source').length < 400) {
     show(document.body);
   } else {
@@ -82,10 +83,10 @@ window.onload = function() {
      `;
 
      content.push([count, r]);
-     document.body.removeChild(r);
+     cont.removeChild(r);
   });
   content.sort((b,a) => a[0] - b[0]).forEach(r => {
-    document.body.appendChild(r[1])
+    cont.appendChild(r[1])
   });
 }
 
