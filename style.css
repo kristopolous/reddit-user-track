@@ -7,7 +7,7 @@ a:hover { color: #99f }
 body { font-size:0; margin: 0; padding: 0; background: black; }
 video,img { vertical-align: top; width: 33%; visibility: hidden; }
 div.wrap { width: 97% }
-div.inner {height:45rem; overflow-y:hidden }
+div.inner {height:40vw; overflow-y:hidden }
 div.inner.all {height:95rem;overflow-y:auto }
 .all video, .all img { width: 33.3%; }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
@@ -29,5 +29,5 @@ span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;backgro
 
 @media only screen and (max-width: 768px){
   .all video,.all img { width: 50%; }
-  div.inner {height:30rem }
+  div.inner {height:40vw }
 }
