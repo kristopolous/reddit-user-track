@@ -112,7 +112,7 @@ foreach($toShow as $user_short) {
         }
       }
       $count ++;
-      if($count > 3) {
+      if($count > 3 && !$when) {
         continue;
       }
       if($is_first) {
