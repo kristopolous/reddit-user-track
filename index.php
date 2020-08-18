@@ -117,7 +117,7 @@ foreach($toShow as $user_short) {
         }
       }
       $count ++;
-      if($count > 3 && !$when) {
+      if($count > 3 && ($format !== '*' || !$when)) {
         continue;
       }
       if($is_first) {
