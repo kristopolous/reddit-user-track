@@ -7,7 +7,6 @@
 
 include('db.php');
 $db = db();
-$perPage = 30;
 
 $use_fail = isset($_GET['fail']);
 $last = $_GET['last'] ?? 4;
@@ -17,6 +16,12 @@ $max = $_GET['max'] ?? PHP_INT_MAX;
 $min = $_GET['min'] ?? 0;
 $page = $_GET['page'] ?? 0;
 $userList = $_GET['users'] ?? null;
+
+if ($format === '*') {
+  $perPage = 30;
+} else {
+  $perPage = 5;
+}
 
 $start = $page * $perPage;
 $end = ($page + 1) * $perPage;
