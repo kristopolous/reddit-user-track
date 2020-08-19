@@ -196,11 +196,15 @@ for who in all:
                     continue
 
             try:
-                urllib.request.urlretrieve(url_to_get, path)
+                request = urllib.request.Request(url_to_get, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
+                remote = urllib.request.urlopen(request)
+                with open(path, 'bw') as f:
+                    f.write(remote.read())
+
                 urllist.add(entry.url)
 
             except Exception as ex:
-                print("woops, can't get {}: {}".format(entry.url, ex))
+                print("woops, can't get {} ({} -> {}): {}".format(entry.url, url_to_get, path, ex))
                 ignore.add(path)
                 continue
         else:
