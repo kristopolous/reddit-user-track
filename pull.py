@@ -173,7 +173,6 @@ for who in all:
 
             print(" \_{}".format(path))
             if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
-                pprint.pprint(entry.media_metadata)
                 if os.path.exists(path):
                     print("<< {}".format(path))
                     os.unlink(path)
