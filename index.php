@@ -1,8 +1,4 @@
-<!doctype html5>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel=stylesheet href=style.css />
-<script src=remember.js></script>
-<div id=links>
+<!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
 <?php
 
 include('db.php');
@@ -49,17 +45,17 @@ foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
     $unit = "$t hour";
   }
   
-  $klass = ($last == $t) ? 'class=active' : '';
-  echo "<a $klass href='" . dolink('last', $t) . "'>$unit</a>";
+  $klass = ($last == $t) ? 'class=active ' : '';
+  echo "<a ${klass}href='" . dolink('last', $t) . "'>$unit</a>";
 }
 $klass = '';
 if($last == 'all') { 
-  $klass = 'class=active';
+  $klass = 'class=active ';
   if(empty($_GET['last'])) { 
     $last = 24 * 365 * 20;
   }
 }
-echo "<a $klass href='" . dolink('last', 'all') . "'>all</a>";
+echo "<a ${klass}href='" . dolink('last', 'all') . "'>all</a>";
 echo "</div>";
 echo "<div id=content>";
 
@@ -169,8 +165,4 @@ if($page > 0) {
 if($ix > $start + $perPage) {
   echo "<a href=" . dolink('page', $page + 1) . ">next</a>";
 }
-?> 
-</div>
-<script>
-var all = <?=json_encode($res);?>, db = <?=json_encode($db) ?>;
-</script>
+?></div><script>Object.assign(self,<?= json_encode([ 'all' => $res, 'db' => $db]) ?>);</script>
