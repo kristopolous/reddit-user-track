@@ -17,6 +17,12 @@ from gfycat.client import GfycatClient
 from imgurpython import ImgurClient
 import pprint
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--force", help="Force", action='store_true')
+parser.add_argument("-g", "--gallery", help="Get the galleries again", action='store_true')
+parser.add_argument("-v", "--video", help="Get the video again", action='store_true')
+args, unknown = parser.parse_known_args()
+
 reddit = praw.Reddit(
     client_id=secrets.reddit['pull']['id'], 
     client_secret=secrets.reddit['pull']['secret'], 
@@ -36,10 +42,6 @@ imgur = ImgurClient(
 
 subredMap = {}
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--force", help="Force", action='store_true')
-parser.add_argument("-g", "--gallery", help="Get the galleries again", action='store_true')
-args, unknown = parser.parse_known_args()
 
 def lf(path, kind = 'set'):
     if os.path.exists(path):
@@ -169,9 +171,20 @@ for who in all:
         if parts.netloc == 'gfycat.com':
            path += '.mp4'
 
-        if not entry.url in urllist or (args.gallery and 'gallery' in entry.url):  
+        if not entry.url in urllist or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
 
             print(" \_{}".format(path))
+
+            if hasattr(entry, 'is_video') and entry.is_video and entry.secure_media is not None:
+                url_to_get = entry.secure_media['reddit_video']['fallback_url']
+
+                # this is a lie, but eh so what
+                path += '.mp4'
+                if os.path.exists(path): 
+                    continue
+                print("   \_{}".format(url_to_get))
+
+
             if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
                 if os.path.exists(path):
                     print("<< {}".format(path))
