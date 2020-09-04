@@ -171,7 +171,7 @@ for who in all:
         if not entry.url in urllist or 'gallery' in entry.url:  
 
             print(" \_{}".format(path))
-            if hasattr(entry, 'is_gallery'):
+            if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
                 for k,v in entry.media_metadata.items():
                     imgurl = v['s']['u']
                     urlparts = urlparse(imgurl)
@@ -183,6 +183,7 @@ for who in all:
                         with open(path, 'bw') as f:
                             f.write(remote.read())
                         print("   \_{}".format(path))
+                continue
 
             elif parts.netloc in ['imgur.com','i.imgur.com']:
                 noext = os.path.splitext(parts.path)[0]
@@ -208,7 +209,7 @@ for who in all:
 
                 print("   \_{}".format(url_to_get))
 
-            if parts.netloc == 'gfycat.com':
+            elif parts.netloc == 'gfycat.com':
                 url_path = parts.path.strip('/')
                 try:
                     obj = gfycat.query_gfy(url_path)
