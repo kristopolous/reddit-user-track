@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import praw
+import logging
 import os
 import urllib
 import secrets
@@ -8,11 +9,13 @@ import sys
 import pdb
 import hashlib
 import imagehash
+import argparse
 from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
 from gfycat.client import GfycatClient
 from imgurpython import ImgurClient
+import pprint
 
 reddit = praw.Reddit(
     client_id=secrets.reddit['pull']['id'], 
@@ -33,6 +36,10 @@ imgur = ImgurClient(
 
 subredMap = {}
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--force", help="force", action='store_true')
+args, unknown = parser.parse_known_args()
+
 def lf(path, kind = 'set'):
     if os.path.exists(path):
         with open(path) as fp:
@@ -47,6 +54,10 @@ def lf(path, kind = 'set'):
 ignore = lf('ignore.txt') or set()
 fail = lf('fail.json', 'json') or {}
 cksum = lf('cksum.json', 'json') or {}
+
+def get(url):
+    request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
+    return urllib.request.urlopen(request)
 
 def cksumcheck(path):
     global cksum
@@ -78,8 +89,8 @@ def cksumcheck(path):
     else:
         cksum[ihash] = filename
 
-if len(sys.argv) > 1:
-    all = [sys.argv[1].strip()]
+if len(unknown) > 0:
+    all = unknown
 
 else: 
     with open('userlist.txt') as fp:
@@ -107,7 +118,7 @@ for who in all:
 
 
     urllist = set()
-    if os.path.exists("{}/urllist.txt".format(content)):
+    if not args.force and os.path.exists("{}/urllist.txt".format(content)):
         with open("{}/urllist.txt".format(content)) as fp:
             urllist = set(fp.read().splitlines())
 
@@ -148,7 +159,7 @@ for who in all:
         path = "{}/{}".format(content, filename)
 
         if filename in ignore:
-            #print("  Ignoring: {}".format(filename))
+            logging.info("Ignoring: {}".format(filename))
             continue
 
         parts = urlparse(entry.url)
@@ -157,9 +168,23 @@ for who in all:
         if parts.netloc == 'gfycat.com':
            path += '.mp4'
 
-        if not entry.url in urllist: 
+        if not entry.url in urllist or 'gallery' in entry.url:  
+
             print(" \_{}".format(path))
-            if parts.netloc in ['imgur.com','i.imgur.com']:
+            if hasattr(entry, 'is_gallery'):
+                for k,v in entry.media_metadata.items():
+                    imgurl = v['s']['u']
+                    urlparts = urlparse(imgurl)
+                    path = "{}/{}".format(content, urlparts.path[1:])
+
+                    if not os.path.exists(path):
+                        remote = get(imgurl)
+
+                        with open(path, 'bw') as f:
+                            f.write(remote.read())
+                        print("   \_{}".format(path))
+
+            elif parts.netloc in ['imgur.com','i.imgur.com']:
                 noext = os.path.splitext(parts.path)[0]
                 pieces = noext.strip('/').split('/')
                 try:
