@@ -37,7 +37,8 @@ imgur = ImgurClient(
 subredMap = {}
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--force", help="force", action='store_true')
+parser.add_argument("-f", "--force", help="Force", action='store_true')
+parser.add_argument("-g", "--gallery", help="Get the galleries again", action='store_true')
 args, unknown = parser.parse_known_args()
 
 def lf(path, kind = 'set'):
@@ -168,10 +169,15 @@ for who in all:
         if parts.netloc == 'gfycat.com':
            path += '.mp4'
 
-        if not entry.url in urllist or 'gallery' in entry.url:  
+        if not entry.url in urllist or (args.gallery and 'gallery' in entry.url):  
 
             print(" \_{}".format(path))
             if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
+                pprint.pprint(entry.media_metadata)
+                if os.path.exists(path):
+                    print("<< {}".format(path))
+                    os.unlink(path)
+
                 for k,v in entry.media_metadata.items():
                     imgurl = v['s']['u']
                     urlparts = urlparse(imgurl)
