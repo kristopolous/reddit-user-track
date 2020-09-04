@@ -121,9 +121,11 @@ for who in all:
 
 
     urllist = set()
-    if not args.force and os.path.exists("{}/urllist.txt".format(content)):
-        with open("{}/urllist.txt".format(content)) as fp:
-            urllist = set(fp.read().splitlines())
+
+    if not args.force:
+        urllist = lf("{}/urllist.txt".format(content)) or set()
+
+    titlelist = lf("{}/titlelist.txt".format(content)) or set()
 
     try:
         submissions = reddit.redditor(who).submissions.new()
@@ -167,6 +169,7 @@ for who in all:
 
         parts = urlparse(entry.url)
         url_to_get = entry.url
+        titlelist.add(entry.title)
 
         if parts.netloc == 'gfycat.com':
            path += '.mp4'
@@ -268,6 +271,9 @@ for who in all:
 
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
+
+    with open("{}/titlelist.txt".format(content), 'w') as fp:
+        fp.write('\n'.join(list(titlelist)))
 
 for i in ['ignore']:
     with open(i + '.txt', 'w') as f:

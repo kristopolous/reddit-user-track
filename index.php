@@ -15,6 +15,7 @@ $format = $_GET['format'] ?? '*';
 $max = $_GET['max'] ?? PHP_INT_MAX;
 $min = $_GET['min'] ?? 0;
 $page = $_GET['page'] ?? 0;
+$qstr = $_GET['q'] ?? null;
 $userList = $_GET['users'] ?? null;
 
 if ($format === '*') {
@@ -84,6 +85,26 @@ if(isset($userList)) {
   $toShow = array_keys($db);
 }
 
+if ($qstr) {
+  $newToShow = [];
+  $parts = explode(',', $qstr);
+  foreach($toShow as $user) {
+    $doc = file_get_contents("data/$user/titlelist.txt");
+    $match = !!strlen($doc);
+    foreach($parts as $sub) {
+      $match &= (stripos($doc, $sub) !== false);
+      if(!$match) { 
+        break;
+      }
+    }
+    if($match) {
+      $newToShow[] = $user;
+    }
+  }
+  $toShow = $newToShow;
+}
+
+
 $ix = 0;
 foreach($toShow as $user_short) {
   $is_first = true;
@@ -102,7 +123,8 @@ foreach($toShow as $user_short) {
   foreach($list as $f) {
 
     $fname = basename($f);
-    if ($fname == 'urllist.txt' || $fname == 'donelist.txt') {
+    $parts = pathinfo($fname);
+    if($parts['extension'] == 'txt') {
       continue;
     }
     $row[] = $fname;
