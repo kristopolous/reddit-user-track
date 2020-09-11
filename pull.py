@@ -198,7 +198,7 @@ for who in all:
                     urlparts = urlparse(imgurl)
                     path = "{}/{}".format(content, urlparts.path[1:])
 
-                    if not os.path.exists(path):
+                    if not os.path.exists(path) and path not in ignore:
                         remote = get(imgurl)
 
                         with open(path, 'bw') as f:
