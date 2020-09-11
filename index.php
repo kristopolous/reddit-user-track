@@ -12,7 +12,7 @@ $max = $_GET['max'] ?? PHP_INT_MAX;
 $min = $_GET['min'] ?? 0;
 $page = $_GET['page'] ?? 0;
 $qstr = $_GET['q'] ?? null;
-$userList = $_GET['users'] ?? null;
+$userList = $_GET['users'] ?? $_GET['user'] ?? $_GET['userlist'] ?? null;
 
 if ($format === '*') {
   $perPage = 30;
@@ -85,6 +85,9 @@ if ($qstr) {
   $newToShow = [];
   $parts = explode(',', $qstr);
   foreach($toShow as $user) {
+    if (!file_exists("data/$user/titlelist.txt")) {
+      continue;
+    }
     $doc = file_get_contents("data/$user/titlelist.txt");
     $match = !!strlen($doc);
     foreach($parts as $sub) {
@@ -126,6 +129,9 @@ foreach($toShow as $user_short) {
     $row[] = $fname;
     
     $when = filemtime($f);
+    if($newest && $now - $when < 3600 * $newest) {
+      break;
+    }
     if($last == 'all' || ($now - $when < 3600 * $last  && $now - $when > 3600 * $newest) || $filter) {
       if($is_first) {
         $ix ++;
