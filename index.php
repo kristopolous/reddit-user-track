@@ -56,8 +56,15 @@ if($last == 'all') {
   }
 }
 echo "<a ${klass}href='" . dolink('last', 'all') . "'>all</a>";
-echo "</div>";
-echo "<div id=content>";
+?>
+<form>
+<input name=last type=hidden value=<?= $last ?>>
+<input name=page type=hidden value=<?= $page ?>>
+<input name=q placeholder=query value="<?= $qstr ?>" id=search>
+</form>
+</div>
+<div id=content>
+<?php
 
 $now = time();
 $res = [];
