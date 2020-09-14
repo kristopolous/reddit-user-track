@@ -14,13 +14,14 @@ span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;backgro
 .show img, .show video {visibility: visible }
 #paging {
   color: white;
-  font-size: 14px;
+  font-size: 24px;
   text-align: right;
 }
 #paging a {
   background:  rgba(170,170,204,.5);
   text-align: center;
   color: white;
+  padding: 1rem 0;
   display: inline-block;
   margin: 0 2%;
   width: 10%;
