@@ -33,7 +33,6 @@ if(!empty($userList)) {
   $last = 'all';
 }
 
-
 foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
   if ($t > 48) {
     if ($t > 24 * 14) {
@@ -60,7 +59,8 @@ echo "<a ${klass}href='" . dolink('last', 'all') . "'>all</a>";
 <form>
 <input name=last type=hidden value=<?= $last ?>>
 <input name=page type=hidden value=<?= $page ?>>
-<input name=q placeholder=query value="<?= $qstr ?>" id=search>
+<input name=q placeholder=query value="<?= $qstr ?>">
+<button>go</button>
 </form>
 </div>
 <div id=content>
@@ -91,14 +91,18 @@ if(isset($userList)) {
 if ($qstr) {
   $newToShow = [];
   $parts = explode(',', $qstr);
+  $regParts = [];
+  foreach($parts as $sub) {
+    $regParts[] = '/' . $sub . '/';
+  }
   foreach($toShow as $user) {
     if (!file_exists("data/$user/titlelist.txt")) {
       continue;
     }
     $doc = file_get_contents("data/$user/titlelist.txt");
     $match = !!strlen($doc);
-    foreach($parts as $sub) {
-      $match &= (stripos($doc, $sub) !== false);
+    foreach($regParts as $sub) {
+      $match &= preg_match($sub, $doc);
       if(!$match) { 
         break;
       }
