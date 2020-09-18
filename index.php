@@ -5,7 +5,7 @@ include('db.php');
 $db = db();
 
 $use_fail = isset($_GET['fail']);
-$last = $_GET['last'] ?? 4;
+$last = $_GET['last'] ?? 2;
 $newest = $_GET['newest'] ?? 0;
 $format = $_GET['format'] ?? '*';
 $max = $_GET['max'] ?? PHP_INT_MAX;
@@ -23,9 +23,11 @@ if ($format === '*') {
 $start = $page * $perPage;
 $end = ($page + 1) * $perPage;
 
-function dolink($k, $v) {
+function dolink($kv) {
   $copy = $_GET;
-  $copy[$k] = $v;
+  foreach($kv as $k => $v) {
+    $copy[$k] = $v;
+  }
   return "?" . http_build_query($copy);
 }
 
@@ -33,19 +35,27 @@ if(!empty($userList)) {
   $last = 'all';
 }
 
-foreach([2,4,8,16,36,72,24*7,24*7*3,24*7*5] as $t) {
+$prev = false;
+foreach([2,8,24,48,96,24*7,24*7*3,24*7*8,24*7*24] as $t) {
   if ($t > 48) {
     if ($t > 24 * 14) {
       $unit = $t / (24 * 7) . " week";
     } else {
-      $unit = $t / 24 . " day";
+      $unit = $t / 24 . " days";
     }
   } else {
     $unit = "$t hour";
   }
   
   $klass = ($last == $t) ? 'class=active ' : '';
-  echo "<a ${klass}href='" . dolink('last', $t) . "'>$unit</a>";
+  if($prev) {
+    $link = dolink(['last' => $t, 'newest' => $prev]);
+  } else {
+    $link = dolink(['last' => $t]);
+  }
+
+  echo "<a ${klass}href='$link'>$unit</a>";
+  $prev = $t;
 }
 $klass = '';
 if($last == 'all') { 
@@ -54,7 +64,7 @@ if($last == 'all') {
     $last = 24 * 365 * 20;
   }
 }
-echo "<a ${klass}href='" . dolink('last', 'all') . "'>all</a>";
+echo "<a ${klass}href='" . dolink(['last' => 'all']) . "'>all</a>";
 ?>
 <form>
 <input name=last type=hidden value=<?= $last ?>>
@@ -177,9 +187,9 @@ foreach($toShow as $user_short) {
 }
 echo "</div><div id=paging>";
 if($page > 0) {
-  echo "<a href=" . dolink('page', $page - 1) . ">prev</a>";
+  echo "<a href=" . dolink(['page' => $page - 1]) . ">prev</a>";
 }
 if($ix > $start + $perPage) {
-  echo "<a href=" . dolink('page', $page + 1) . ">next</a>";
+  echo "<a href=" . dolink(['page' => $page + 1]) . ">next</a>";
 }
 ?></div><script>Object.assign(self,<?= json_encode([ 'all' => $res, 'db' => $db]) ?>);</script>
