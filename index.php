@@ -26,7 +26,11 @@ $end = ($page + 1) * $perPage;
 function dolink($kv) {
   $copy = $_GET;
   foreach($kv as $k => $v) {
-    $copy[$k] = $v;
+    if($v == false) {
+      unset($copy[$k]);
+    } else {
+      $copy[$k] = $v;
+    }
   }
   return "?" . http_build_query($copy);
 }
@@ -48,11 +52,7 @@ foreach([2,8,24,48,96,24*7,24*7*3,24*7*8,24*7*24] as $t) {
   }
   
   $klass = ($last == $t) ? 'class=active ' : '';
-  if($prev) {
-    $link = dolink(['last' => $t, 'newest' => $prev]);
-  } else {
-    $link = dolink(['last' => $t]);
-  }
+  $link = dolink(['last' => $t, 'newest' => $prev]);
 
   echo "<a ${klass}href='$link'>$unit</a>";
   $prev = $t;
