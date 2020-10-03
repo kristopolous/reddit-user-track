@@ -1,5 +1,5 @@
 #!/bin/bash
-while read -p ">> " action; do
+while read -e -p ">> " action; do
   user=${action:1}
   action=${action:0:1}
   [[ $action == '+' ]] && ./add.sh $user &
