@@ -40,6 +40,6 @@ button,input {
 
 
 @media only screen and (max-width: 768px){
-  .all video,.all img { width: 50%; }
+  video, img { width: 50%; }
   div.inner {height:40vw }
 }
