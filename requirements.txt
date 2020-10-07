@@ -1,4 +1,5 @@
 praw
 imagehash
 gfycat
+cv2
 imgurpython
