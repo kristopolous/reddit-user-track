@@ -1,11 +1,31 @@
 #!/usr/bin/env python3
 import cv2
 import sys
+import os
+import glob
+import json
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 
-for imagePath in sys.argv[1:]:
+def lf(path):
+    if os.path.exists(path):
+        with open(path) as fp:
+            try:
+                return json.load(fp)
+            except:
+                return {}
+
+base = sys.argv[1]
+
+faceMap = lf('data/{}/faces.json'.format(base)) or {}
+
+for imagePath in glob.glob("data/{}/*[jp][np]g".format(base)):
+    filename = os.path.basename(imagePath)
+
+    if filename in faceMap:
+        continue
+
     try:
         image = cv2.imread(imagePath)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -16,8 +36,8 @@ for imagePath in sys.argv[1:]:
             minSize=(300, 300),
             flags = cv2.CASCADE_SCALE_IMAGE
         )
-        if len(faces) > 0:
-            print(imagePath)
+        faceMap[imagePath] = len(faces)
+
         """
         print(len(faces), imagePath)
         if len(faces) > 0:
@@ -29,4 +49,12 @@ for imagePath in sys.argv[1:]:
     except:
         continue
 
+with open("data/{}/faces.json".format(base), 'w') as fp:
+    json.dump(faceMap, fp)
+
+faceMaster = lf('facemaster.json') or {}
+faceMaster[base] = sum(faceMap.values()) / len(faceMap.values())
+
+with open("facemaster.json", 'w') as fp:
+    json.dump(faceMaster, fp)
 
