@@ -20,7 +20,9 @@ base = sys.argv[1]
 
 faceMap = lf('data/{}/faces.json'.format(base)) or {}
 
+print(base, end='', flush=True)
 for imagePath in glob.glob("data/{}/*[jp][np]g".format(base)):
+    print('.', end='', flush=True)
     filename = os.path.basename(imagePath)
 
     if filename in faceMap:
@@ -36,7 +38,7 @@ for imagePath in glob.glob("data/{}/*[jp][np]g".format(base)):
             minSize=(300, 300),
             flags = cv2.CASCADE_SCALE_IMAGE
         )
-        faceMap[imagePath] = len(faces)
+        faceMap[filename] = len(faces)
 
         """
         print(len(faces), imagePath)
@@ -48,6 +50,8 @@ for imagePath in glob.glob("data/{}/*[jp][np]g".format(base)):
         """
     except:
         continue
+
+print('done')
 
 with open("data/{}/faces.json".format(base), 'w') as fp:
     json.dump(faceMap, fp)
