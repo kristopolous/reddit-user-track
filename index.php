@@ -147,6 +147,9 @@ foreach($toShow as $user_short) {
     if($parts['extension'] == 'txt') {
       continue;
     }
+    if($parts['extension'] == 'json') {
+      continue;
+    }
     $row[] = $fname;
     
     $when = filemtime($f);
