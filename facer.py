@@ -56,9 +56,11 @@ print('done')
 with open("data/{}/faces.json".format(base), 'w') as fp:
     json.dump(faceMap, fp)
 
-faceMaster = lf('facemaster.json') or {}
-faceMaster[base] = sum(faceMap.values()) / len(faceMap.values())
+try:
+    faceMaster = lf('facemaster.json') or {}
+    faceMaster[base] = sum(faceMap.values()) / len(faceMap.values())
 
-with open("facemaster.json", 'w') as fp:
-    json.dump(faceMaster, fp)
-
+    with open("facemaster.json", 'w') as fp:
+        json.dump(faceMaster, fp)
+except: 
+    pass
