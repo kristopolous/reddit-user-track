@@ -12,6 +12,7 @@ $max = $_GET['max'] ?? PHP_INT_MAX;
 $min = $_GET['min'] ?? 0;
 $page = $_GET['page'] ?? 0;
 $qstr = $_GET['q'] ?? null;
+$fm = $_GET['fm'] ?? null;
 $userList = $_GET['users'] ?? $_GET['user'] ?? $_GET['userlist'] ?? null;
 
 if ($format === '*') {
@@ -79,6 +80,17 @@ echo "<a ${klass}href='" . dolink(['last' => 'all']) . "'>all</a>";
 $now = time();
 $res = [];
 $filter = false;
+
+if($fm) {
+  $fm = floatval($fm);
+  $map = json_decode(file_get_contents('facemaster.json'), true);
+  $filter = [];
+  foreach($map as $k => $v) {
+    if($v > $fm) {
+      $filter[] = $k;
+    }
+  }
+}
 
 if($use_fail) {
   $filter = array_keys(json_decode(file_get_contents('fail.json'), true));
