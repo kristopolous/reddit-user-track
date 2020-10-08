@@ -38,7 +38,7 @@ for userPath in glob.glob('data/*'):
                 minSize=(300, 300),
                 flags = cv2.CASCADE_SCALE_IMAGE
             )
-            faceMap[filename] = len(faces)
+            faceMap[filename] = 1 if len(faces) else 0
 
             """
             print(len(faces), imagePath)
