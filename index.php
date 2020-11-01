@@ -5,7 +5,7 @@ include('db.php');
 $db = db();
 
 $use_fail = isset($_GET['fail']);
-$last = $_GET['last'] ?? 2;
+$last = $_GET['last'] ?? 'all';
 $newest = $_GET['newest'] ?? 0;
 $format = $_GET['format'] ?? '*';
 $max = $_GET['max'] ?? PHP_INT_MAX;
