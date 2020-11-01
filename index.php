@@ -168,7 +168,7 @@ foreach($toShow as $user_short) {
     if($newest && $now - $when < 3600 * $newest) {
       break;
     }
-    if($last == 'all' || ($now - $when < 3600 * $last  && $now - $when > 3600 * $newest) || $filter) {
+    if($last == 'all' || ($now - $when < 3600 * $last  && $now - $when > 3600 * $newest)) { // || $filter) {
       if($is_first) {
         $ix ++;
         if($ix <= $start || $ix > $end) {
