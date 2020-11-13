@@ -13,6 +13,7 @@ $min = $_GET['min'] ?? 0;
 $page = $_GET['page'] ?? 0;
 $qstr = $_GET['q'] ?? null;
 $fm = $_GET['fm'] ?? null;
+$fu = $_GET['fu'] ?? 1.0;
 $userList = $_GET['users'] ?? $_GET['user'] ?? $_GET['userlist'] ?? null;
 
 if ($format === '*') {
@@ -86,7 +87,7 @@ if($fm) {
   $map = json_decode(file_get_contents('facemaster.json'), true);
   $filter = [];
   foreach($map as $k => $v) {
-    if($v > $fm) {
+    if($v > $fm && $v < $fu) {
       $filter[] = $k;
     }
   }
