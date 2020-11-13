@@ -99,6 +99,9 @@ else:
     with open('userlist.txt') as fp:
         all = sorted(list(set([x[1].strip('/\n ') for x in enumerate(fp)])), key=str.casefold)
 
+if not os.path.isdir('data'):
+    os.mkdir('data')
+
 for who in all:
     content = "data/{}".format(who)
 
