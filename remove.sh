@@ -5,6 +5,7 @@ while [[ -n "$1" ]]; do
     rm -r data/$1
     sed -i '/'$1'/d' userlist.txt
   fi
+  echo $1 del $(date) >> .log.tx
   echo $1 >> banlist.txt
   shift
 done
