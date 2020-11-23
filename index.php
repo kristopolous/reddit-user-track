@@ -184,7 +184,6 @@ foreach($toShow as $user_short) {
       if($count > 3 && $format == '*') { // || !$when)) {
         continue;
       }
-      echo "<< $ix $count >>";
       if($is_first) {
         echo "\n<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
