@@ -178,11 +178,11 @@ foreach($toShow as $user_short) {
         }
       }
       $count ++;
-      if($count > 3 && ($format !== '*' || !$when)) {
+      if($count > 3 && $format == '*') { // || !$when)) {
         continue;
       }
       if($is_first) {
-        echo "<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
+        echo "\n\n<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
         echo "<div class=inner>" ;
         $is_first = false;
@@ -192,9 +192,9 @@ foreach($toShow as $user_short) {
         echo "<video class=video autoplay loop muted='' nocontrols><source src='$f'></video>";
       } else {
         if($what['extension'] == 'gif') { 
-          echo "<img data-src='$f'>";
+          echo "\n <img data-src='$f'>";
         } else {
-          echo "<img data-src='tnail.php?url=$f'>";
+          echo "\n <img data-src='tnail.php?url=$f'>";
         }
       }
     }
