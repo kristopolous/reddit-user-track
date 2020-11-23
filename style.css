@@ -21,10 +21,10 @@ span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;backgro
   background:  rgba(170,170,204,.5);
   text-align: center;
   color: white;
-  padding: 1rem 0;
+  padding: 1rem 2rem;
   display: inline-block;
-  margin: 0 2%;
-  width: 10%;
+  margin: 0 1rem;
+  width: auto;
 }
 form {
   display: inline-block;
