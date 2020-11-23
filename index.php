@@ -153,25 +153,28 @@ foreach($toShow as $user_short) {
   if ($min > count($list) || count($list) > $max ) {
     continue;
   }
+  if($ix > $end) {
+    break;
+  }
   foreach($list as $f) {
 
     $fname = basename($f);
     $parts = pathinfo($fname);
-    if($parts['extension'] == 'txt') {
+
+    if($parts['extension'] == 'txt' || $parts['extension'] == 'json') {
       continue;
     }
-    if($parts['extension'] == 'json') {
-      continue;
-    }
+
     $row[] = $fname;
     
     $when = filemtime($f);
     if($newest && $now - $when < 3600 * $newest) {
       break;
     }
-    if($last == 'all' || ($now - $when < 3600 * $last  && $now - $when > 3600 * $newest)) { // || $filter) {
+    if($last == 'all' || !$is_first || ($now - $when < 3600 * $last  && $now - $when > 3600 * $newest)) { // || $filter) {
       if($is_first) {
         $ix ++;
+        // paging
         if($ix <= $start || $ix > $end) {
           // don't clear the is_first and we won't add it
           break;
@@ -181,8 +184,9 @@ foreach($toShow as $user_short) {
       if($count > 3 && $format == '*') { // || !$when)) {
         continue;
       }
+      echo "<< $ix $count >>";
       if($is_first) {
-        echo "\n\n<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
+        echo "\n<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
         echo "<div class=inner>" ;
         $is_first = false;
