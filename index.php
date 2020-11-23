@@ -191,7 +191,11 @@ foreach($toShow as $user_short) {
       if($what['extension'] == 'mp4' || $what['extension'] == 'gifv') {
         echo "<video class=video autoplay loop muted='' nocontrols><source src='$f'></video>";
       } else {
-        echo "<img data-src='tnail.php?url=$f'>";
+        if($what['extension'] == 'gif') { 
+          echo "<img data-src='$f'>";
+        } else {
+          echo "<img data-src='tnail.php?url=$f'>";
+        }
       }
     }
   }
