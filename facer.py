@@ -18,6 +18,8 @@ def lf(path):
 
 for userPath in glob.glob('data/*'):
     user = os.path.basename(userPath)
+    if not os.path.isdir(userPath):
+        continue
     faceMap = lf('data/{}/faces.json'.format(user)) or {}
 
     print(user, end='', flush=True)
