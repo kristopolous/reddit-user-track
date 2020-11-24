@@ -5,7 +5,7 @@ while [[ -n "$1" ]]; do
     mv data/$1 /tmp/
     sed -i '/'$1'/d' userlist.txt
   fi
-  echo $1 del $(date) >> .log.tx
+  echo $1 del $(date) >> .log.txt
   echo $1 >> banlist.txt
   shift
 done
