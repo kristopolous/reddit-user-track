@@ -106,6 +106,7 @@ if(isset($userList)) {
     if(!array_key_exists($k, $db)) {
       $db[$k] = 0;
     }
+    // $db[$k] = 0;
   }
   arsort($db);
   $toShow = array_keys($db);
