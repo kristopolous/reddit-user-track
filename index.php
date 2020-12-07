@@ -120,15 +120,18 @@ if ($qstr) {
     $regParts[] = '/' . $sub . '/';
   }
   foreach($toShow as $user) {
-    if (!file_exists("data/$user/titlelist.txt")) {
-      continue;
-    }
-    $doc = file_get_contents("data/$user/titlelist.txt");
-    $match = !!strlen($doc);
-    foreach($regParts as $sub) {
-      $match &= preg_match($sub, $doc);
-      if(!$match) { 
-        break;
+    $match = preg_match($user, $doc);
+    if(!$match) {
+      if (!file_exists("data/$user/titlelist.txt")) {
+        continue;
+      }
+      $doc = file_get_contents("data/$user/titlelist.txt");
+      $match = !!strlen($doc);
+      foreach($regParts as $sub) {
+        $match &= preg_match($sub, $doc);
+        if(!$match) { 
+          break;
+        }
       }
     }
     if($match) {
