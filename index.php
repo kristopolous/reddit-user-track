@@ -120,7 +120,10 @@ if ($qstr) {
     $regParts[] = '/' . $sub . '/';
   }
   foreach($toShow as $user) {
-    $match = preg_match($user, $doc);
+    $match = true;
+    foreach($regParts as $sub) {
+      $match &= preg_match($sub, $user);
+    }
     if(!$match) {
       if (!file_exists("data/$user/titlelist.txt")) {
         continue;
