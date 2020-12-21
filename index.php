@@ -199,7 +199,7 @@ foreach($toShow as $user_short) {
       }
       $what = pathinfo($f);
       if($what['extension'] == 'mp4' || $what['extension'] == 'gifv') {
-        echo "<video class=video autoplay loop muted='' nocontrols><source src='$f'></video>";
+        echo "<video poster=\"tnail.php?url=$f\" class=video preload=none loop muted='' controls><source src='$f'></video>";
       } else {
         if($what['extension'] == 'gif') { 
           echo "\n <img data-src='$f'>";
