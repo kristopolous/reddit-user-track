@@ -117,7 +117,7 @@ if ($qstr) {
   $parts = explode(',', $qstr);
   $regParts = [];
   foreach($parts as $sub) {
-    $regParts[] = '/' . $sub . '/';
+    $regParts[] = '/' . $sub . '/i';
   }
   foreach($toShow as $user) {
     $match = true;
@@ -201,11 +201,7 @@ foreach($toShow as $user_short) {
       if($what['extension'] == 'mp4' || $what['extension'] == 'gifv') {
         echo "<video poster=\"tnail.php?url=$f\" class=video preload=none loop muted='' controls><source src='$f'></video>";
       } else {
-        if($what['extension'] == 'gif') { 
-          echo "\n <img data-src='$f'>";
-        } else {
-          echo "\n <img data-src='tnail.php?url=$f'>";
-        }
+        echo "\n <img data-src='tnail.php?url=$f'>";
       }
     }
   }
