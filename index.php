@@ -1,6 +1,7 @@
 <!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
 <?php
 
+include('lib.php');
 include('db.php');
 $db = db();
 
@@ -191,14 +192,15 @@ foreach($toShow as $user_short) {
       if($count > 3 && $format == '*') { // || !$when)) {
         continue;
       }
+      $orig = $f;
+      $f = preg_replace("/%2F/", "/", urlencode($f));
       if($is_first) {
         echo "\n<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
         echo "<div class=inner>" ;
         $is_first = false;
       }
-      $what = pathinfo($f);
-      if($what['extension'] == 'mp4' || $what['extension'] == 'gifv') {
+      if(is_video($orig)) {
         echo "<video poster=\"tnail.php?url=$f\" class=video preload=none loop muted='' controls><source src='$f'></video>";
       } else {
         echo "\n <img data-src='tnail.php?url=$f'>";
