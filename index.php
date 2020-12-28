@@ -203,7 +203,7 @@ foreach($toShow as $user_short) {
       if(is_video($orig)) {
         echo "<video poster=\"tnail.php?url=$f\" class=video preload=none loop muted='' controls><source src='$f'></video>";
       } else {
-        echo "\n <img data-src='tnail.php?url=$f'>";
+        echo "\n <img src='tnail.php?url=$f'>";
       }
     }
   }

@@ -5,7 +5,7 @@ a:hover { color: #99f }
 #links a.active { background: rgba(170,170,204,.5); color: #fff }
 #links a:hover { background: #aac; color: #000 }
 body { font-size:0; margin: 0; padding: 0; background: black; }
-video,img { vertical-align: top; width: 33%; visibility: hidden; }
+video,img { vertical-align: top; width: 33% }
 div.wrap { width: 97% }
 div.inner {height:40vw; overflow-y:hidden }
 div.inner.all {height:95rem;overflow-y:auto }

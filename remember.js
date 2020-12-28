@@ -11,12 +11,12 @@ function showall(who,el) {
     let ext = asset.split('.').pop();
     if(ext == 'mp4' || ext == 'gifv') {
       html = ` 
-        <video class=video autoplay loop muted="" nocontrols>
+        <video poster="tnail.php?url=data/${who}/${asset}" preload=none loop muted='' controls class=video muted="">
         <source src="data/${who}/${asset}">
         </video>
         `;
     } else {
-      html = `<img src="data/${who}/${asset}">`;
+      html = `<a target=_blank href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
     }
     content.push(html);
   }
@@ -39,18 +39,8 @@ function vote(who, dir, el) {
   return db[who] || 0;
 }
 
-function show(p) {
-  Array.from(p.querySelectorAll('img,source'))
-    .filter(l => !l.src)
-    .forEach( r => {
-      r.src = r.dataset.src;
-    });
-  p.classList.add('show');
-}
-
 window.onload = function() {
   let cont = document.getElementById('content');
-  show(document.body);
   let content = [];
   document.querySelectorAll(".cont").forEach( r => {
      let 
