@@ -1,4 +1,4 @@
-<!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css /><script src=remember.js></script><div id=links>
+<!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css?1 /><script src=remember.js?1></script><div id=links>
 <?php
 
 include('lib.php');
@@ -16,6 +16,7 @@ $qstr = $_GET['q'] ?? null;
 $fm = $_GET['fm'] ?? null;
 $fu = $_GET['fu'] ?? 1.0;
 $userList = $_GET['users'] ?? $_GET['user'] ?? $_GET['userlist'] ?? null;
+$matchMap = [];
 
 if ($format === '*') {
   $perPage = 30;
@@ -118,7 +119,7 @@ if ($qstr) {
   $parts = explode(',', $qstr);
   $regParts = [];
   foreach($parts as $sub) {
-    $regParts[] = '/' . $sub . '/i';
+    $regParts[] = '/.*' . $sub . '.*/i';
   }
   foreach($toShow as $user) {
     $match = true;
@@ -132,9 +133,16 @@ if ($qstr) {
       $doc = file_get_contents("data/$user/titlelist.txt");
       $match = !!strlen($doc);
       foreach($regParts as $sub) {
-        $match &= preg_match($sub, $doc);
+        $match &= preg_match_all($sub, $doc, $matches);
         if(!$match) { 
           break;
+        }
+        if(!array_key_exists($user, $matchMap)) {
+          $matchMap[$user] = [];
+        }
+        foreach($matches[0] as $line) {
+
+          $matchMap[$user][] = $line;
         }
       }
     }
@@ -198,6 +206,11 @@ foreach($toShow as $user_short) {
         echo "\n<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
         echo "<div class=inner>" ;
+        if(array_key_exists($user_short, $matchMap)) {
+          echo "<div class=matches><p>";
+          echo implode('</p><p>', $matchMap[$user_short]);
+          echo "</p></div>";
+        }
         $is_first = false;
       }
       if(is_video($orig)) {
