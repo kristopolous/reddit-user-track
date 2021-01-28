@@ -234,14 +234,14 @@ for who in all:
                 print("   \_{}".format(url_to_get))
 
             elif parts.netloc == 'gfycat.com':
-                url_path = parts.path.strip('/')
+                url_path = parts.path.split('/')
                 try:
-                    obj = gfycat.query_gfy(url_path)
+                    obj = gfycat.query_gfy(url_path[-1])
                     url_to_get = obj.get('gfyItem').get('mp4Url')
                     print("   \_{}".format(url_to_get))
 
-                except:
-                    print("   \_ Unable to get {}".format(entry.url))
+                except Exception as ex:
+                    print("   \_ Unable to get {} : {}".format(entry.url, ex))
                     ignore.add(path)
                     continue
 
