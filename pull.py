@@ -179,18 +179,6 @@ for who in all:
 
         if not entry.url in urllist or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
 
-            print(" \_{}".format(path))
-
-            if hasattr(entry, 'is_video') and entry.is_video and entry.secure_media is not None:
-                url_to_get = entry.secure_media['reddit_video']['fallback_url']
-
-                # this is a lie, but eh so what
-                path += '.mp4'
-                if os.path.exists(path): 
-                    continue
-                print("   \_{}".format(url_to_get))
-
-
             if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
                 if os.path.exists(path):
                     print("<< {}".format(path))
@@ -208,6 +196,17 @@ for who in all:
                             f.write(remote.read())
                         print("   \_{}".format(path))
                 continue
+
+            print(" \_{}".format(path))
+
+            if hasattr(entry, 'is_video') and entry.is_video and entry.secure_media is not None:
+                url_to_get = entry.secure_media['reddit_video']['fallback_url']
+
+                # this is a lie, but eh so what
+                path += '.mp4'
+                if os.path.exists(path): 
+                    continue
+                print("   \_{}".format(url_to_get))
 
             elif parts.netloc in ['imgur.com','i.imgur.com']:
                 noext = os.path.splitext(parts.path)[0]

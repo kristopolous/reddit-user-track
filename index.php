@@ -140,7 +140,7 @@ if ($qstr) {
         if(!array_key_exists($user, $matchMap)) {
           $matchMap[$user] = [];
         }
-        foreach($matches[0] as $line) {
+        foreach(array_slice($matches[0], 0, 3) as $line) {
 
           $matchMap[$user][] = $line;
         }

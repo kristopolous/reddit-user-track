@@ -16,7 +16,7 @@ function showall(who,el) {
         </video>
         `;
     } else {
-      html = `<a target=_blank href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
+      html = `<a target=_blank onclick="vote('${who}',0.1)" href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
     }
     content.push(html);
   }
@@ -24,6 +24,7 @@ function showall(who,el) {
   handler.innerHTML = content.join('');
 }
 
+// dir can also be amount
 function vote(who, dir, el) {
   if (dir) {
     if(!(who in db)) {
