@@ -185,7 +185,16 @@ for who in all:
                     os.unlink(path)
 
                 for k,v in entry.media_metadata.items():
-                    imgurl = v['s']['u']
+                    if 'u' in v['s']:
+                        imgurl = v['s']['u']
+
+                    elif 'gif' in v['s']:
+                        imgurl = v['s']['gif']
+
+                    else:
+                        print("woops! Can't find an image: {}".format(v['s']))
+                        continue
+
                     urlparts = urlparse(imgurl)
                     path = "{}/{}".format(content, urlparts.path[1:])
 
