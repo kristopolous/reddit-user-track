@@ -48,5 +48,9 @@ button,input {
 
 @media only screen and (max-width: 768px){
   video, img { width: 50%; }
+  div.inner * { display: none }
+  div.inner *:nth-of-type(1),
+  div.inner *:nth-of-type(2)
+  { display: inline-block; }
   div.inner {height:40vw }
 }
