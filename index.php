@@ -1,4 +1,4 @@
-<!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css?1 /><script src=remember.js?1></script><div id=links>
+<!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css?3 /><script src=remember.js?2></script><div id=links>
 <?php
 
 include('lib.php');

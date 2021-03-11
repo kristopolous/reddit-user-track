@@ -1,13 +1,13 @@
 a { cursor: pointer; text-decoration: none; color: #aac }
 a:hover { color: #99f }
-#links { font-size: 18px }
+#links { font-size: 18px;background:#111; }
 #links a { display: inline-block; padding: 0.5rem 1rem }
 #links a.active { background: rgba(170,170,204,.5); color: #fff }
 #links a:hover { background: #aac; color: #000 }
-body { font-size:0; margin: 0; padding: 0; background: black; }
+body { font-size:0; margin: 0; padding: 0; background: #112; }
 video,img { vertical-align: top; width: 33% }
 div.wrap { width: 97% }
-div.inner {height:40vw; overflow-y:hidden }
+div.inner {height:40vw; overflow-y:hidden; background: #000; }
 div.inner.all {height:95rem;overflow-y:auto }
 .all video, .all img { width: 33.3%; }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
@@ -44,6 +44,7 @@ button,input {
   font-size: 20px;
   color: #aaa;
 }
+a.profile-link { font-size:16px }
 
 
 @media only screen and (max-width: 768px){
@@ -52,5 +53,6 @@ button,input {
   div.inner *:nth-of-type(1),
   div.inner *:nth-of-type(2)
   { display: inline-block; }
+  div.inner.all a { display: inline };
   div.inner {height:40vw }
 }

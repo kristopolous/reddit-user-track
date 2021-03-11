@@ -55,7 +55,7 @@ window.onload = function() {
        <b>${count}</b>
        <a onclick=vote("${user}",1,this)>&#9650;</a> - 
        <a onclick=vote("${user}",-1,this)>&#9660;</a> 
-       ${last} ( ${days} ) <a href="https://reddit.com/u/${user}">profile</a>
+       ${last} ( ${days} ) <a class='profile-link' href="https://reddit.com/u/${user}">profile</a>
      `;
 
      content.push([count, r]);
