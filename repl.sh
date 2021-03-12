@@ -11,5 +11,5 @@ while read -e -p ">> " action; do
   [[ $action == '-' ]] && ./remove.sh $user 
   echo "Following: $(cat userlist.txt | wc -l)"
   echo "  Blocked: $(cat blocked.txt | wc -l)"
-  echo $(( 1000 * $(cat userlist.txt | wc -l) / $(cat blocked.txt | wc -l) ))% 
+  echo $(( 10000 * $(cat userlist.txt | wc -l) / $(cat blocked.txt | wc -l) ))% 
 done
