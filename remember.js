@@ -30,7 +30,7 @@ function vote(who, dir, el) {
     if(!(who in db)) {
       db[who] = 0;
     }
-    db[who] = (parseInt(db[who], 10) || 0) + dir;
+    db[who] = (parseFloat(db[who], 10) || 0) + dir;
     fetch(`vote.php?who=${who}&what=${db[who]}`);
   } 
   if(el) {
