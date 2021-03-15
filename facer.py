@@ -41,15 +41,6 @@ for userPath in glob.glob('data/*'):
                 flags = cv2.CASCADE_SCALE_IMAGE
             )
             faceMap[filename] = 1 if len(faces) else 0
-
-            """
-            print(len(faces), imagePath)
-            if len(faces) > 0:
-                for (x, y, w, h) in faces:
-                    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                cv2.imshow("Faces found", image)
-                cv2.waitKey(0)
-            """
         except:
             continue
 
