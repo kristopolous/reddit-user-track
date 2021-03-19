@@ -7,7 +7,9 @@ function showall(who,el) {
   let content = [];
   for(let asset of all[who]) {
     let html = '';
-    console.log(asset);
+    asset = 
+       encodeURIComponent(
+      encodeURIComponent(asset));
     let ext = asset.split('.').pop();
     if(ext == 'mp4' || ext == 'gifv') {
       html = ` 
@@ -17,6 +19,7 @@ function showall(who,el) {
         `;
     } else {
       html = `<a target=_blank onclick="vote('${who}',0.1)" href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
+      console.log(html);
     }
     content.push(html);
   }
