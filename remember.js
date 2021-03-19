@@ -7,9 +7,7 @@ function showall(who,el) {
   let content = [];
   for(let asset of all[who]) {
     let html = '';
-    asset = 
-       encodeURIComponent(
-      encodeURIComponent(asset));
+    asset = encodeURIComponent(asset);
     let ext = asset.split('.').pop();
     if(ext == 'mp4' || ext == 'gifv') {
       html = ` 
