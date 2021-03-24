@@ -17,5 +17,5 @@ if (!file_exists("tn/$flatten_url")) {
     shell_exec("convert $url -resize 300x $tn");
   }
 }
-$flatten_url = urlencode($flatten_url);
+$flatten_url = preg_replace('/\+/', ' ', urlencode($flatten_url));
 header("Location: tn/$flatten_url");
