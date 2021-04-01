@@ -129,6 +129,7 @@ for who in all:
         urllist = lf("{}/urllist.txt".format(content)) or set()
 
     titlelist = lf("{}/titlelist.txt".format(content)) or set()
+    commentMap = lf("{}/commentmap.txt".format(content), 'json') or dict()
 
     try:
         submissions = reddit.redditor(who).submissions.new()
@@ -148,6 +149,21 @@ for who in all:
 
         print("Woops, no submissions {} ({})".format(who, fail[who]))
         continue
+
+    try:
+        comments = reddit.redditor(who).comments.new()
+    except:
+        print("comment issues for {}".format(who))
+        continue
+
+    try:
+        comments = list(comments)
+    except:
+        print("comment issues for {}".format(who))
+        continue
+
+    for entry in comments:
+        commentMap[entry.id] = entry.body
 
     for entry in submissions:
         subred = entry.subreddit.display_name
@@ -279,6 +295,9 @@ for who in all:
 
     with open('subreddits.json', 'w') as f:
         json.dump(subredMap, f)
+
+    with open("{}/commentmap.txt".format(content), 'w') as f:
+        json.dump(commentMap, f)
 
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
