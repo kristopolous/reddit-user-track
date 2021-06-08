@@ -52,11 +52,13 @@ window.onload = function() {
        controls = r.querySelector('.user'), 
        count = vote(user);
      
-     controls.innerHTML = `<a onclick=showall("${user}",this)>${user}</a>
-       <b>${count}</b>
+     controls.innerHTML = `
+       <b>${parseFloat(count).toFixed(2)}</b>
+       <a onclick=showall("${user}",this)>${user}</a>
        <a onclick=vote("${user}",1,this)>&#9650;</a> - 
        <a onclick=vote("${user}",-1,this)>&#9660;</a> 
        ${last} ( ${days} ) <a class='profile-link' href="https://reddit.com/u/${user}">profile</a>
+       <a class='profile-link' target=_blank href="comment.php?u=${user}">comments</a>
      `;
 
      content.push([count, r]);

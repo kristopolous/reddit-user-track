@@ -2,13 +2,11 @@
 
 const fs = require('fs');
 
-let map = JSON.parse(fs.readFileSync('save.json'));
-let list = [];
+let subs = JSON.parse(fs.readFileSync('save.json'));
 
-for (var k in map) {
-  list.push([k, map[k]]);
-}
-list.sort((a,b) => a[1] - b[1]).forEach(row => {
-  console.log(row[1], row[0]);
-});
+Object.keys(subs)
+  .map(key => [key, subs[key]])
+  .sort((a,b) => a[1] - b[1]).forEach(row => {
+    console.log(row[1], row[0]);
+  });
 

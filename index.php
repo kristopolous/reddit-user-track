@@ -6,8 +6,8 @@ include('db.php');
 $db = db();
 
 $use_fail = isset($_GET['fail']);
-$last = $_GET['last'] ?? '24';
 $newest = $_GET['newest'] ?? 0;
+$last = $_GET['last'] ?? ($newest ? 24*60*365*10 : '24');
 $format = $_GET['format'] ?? '*';
 $max = $_GET['max'] ?? PHP_INT_MAX;
 $min = $_GET['min'] ?? 0;
@@ -202,6 +202,7 @@ foreach($toShow as $user_short) {
       }
       $orig = $f;
       $f = preg_replace("/%2F/", "/", urlencode($f));
+      $f = preg_replace("/\&/", "%26", $f);
       if($is_first) {
         echo "\n<div data-last=" . floor(($now - $when) / 3600) . " data-user='$user_short' class='cont wrap'>";
         echo "<span class=user></span>";
@@ -213,10 +214,13 @@ foreach($toShow as $user_short) {
         }
         $is_first = false;
       }
+      $dt = date("F d Y H:i:s", filemtime($orig));
+      $dtm = round((time() - filemtime($orig))/3600);
+      $dt = floor($dtm / 24) . 'd ' . $dtm % 24 . "h / $dt ";
       if(is_video($orig)) {
-        echo "<video poster=\"tnail.php?url=$f\" class=video preload=none loop muted='' controls><source src='$f'></video>";
+        echo "<video title='$dt' poster=\"tnail.php?url=$f\" class=video preload=none loop muted='' controls><source src='$f'></video>";
       } else {
-        echo "\n <img src='tnail.php?url=$f'>";
+        echo "\n <img title='$dt' src='tnail.php?url=$f'>";
       }
     }
   }
