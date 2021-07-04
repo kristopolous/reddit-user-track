@@ -190,7 +190,7 @@ for who in all:
         url_to_get = entry.url
         titlelist.add(entry.title)
 
-        if parts.netloc == 'gfycat.com':
+        if parts.netloc == 'gfycat.com' or parts.netloc == 'redgifs.com':
            path += '.mp4'
 
         if not entry.url in urllist or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
@@ -224,6 +224,7 @@ for who in all:
 
             print(" \_{}".format(path))
 
+            print(parts.netloc)
             if hasattr(entry, 'is_video') and entry.is_video and entry.secure_media is not None:
                 url_to_get = entry.secure_media['reddit_video']['fallback_url']
 
@@ -257,7 +258,7 @@ for who in all:
 
                 print("   \_{}".format(url_to_get))
 
-            elif parts.netloc == 'gfycat.com':
+            elif parts.netloc == 'gfycat.com' or parts.netloc == 'redgifs.com':
                 url_path = parts.path.split('/')
                 try:
                     obj = gfycat.query_gfy(url_path[-1])
