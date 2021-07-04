@@ -34,6 +34,7 @@ gfycat = GfycatClient(
     secrets.gfycat['id'],
     secrets.gfycat['secret']
 )
+gfy_list = ['gfycat.com', 'redgifs.com', 'www.redgifs.com']
 
 imgur = ImgurClient(
     secrets.imgur['id'],
@@ -190,7 +191,7 @@ for who in all:
         url_to_get = entry.url
         titlelist.add(entry.title)
 
-        if parts.netloc == 'gfycat.com' or parts.netloc == 'redgifs.com':
+        if parts.netloc in gfy_list:
            path += '.mp4'
 
         if not entry.url in urllist or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
@@ -258,7 +259,7 @@ for who in all:
 
                 print("   \_{}".format(url_to_get))
 
-            elif parts.netloc == 'gfycat.com' or parts.netloc == 'redgifs.com':
+            elif parts.netloc in gfy_list:
                 url_path = parts.path.split('/')
                 try:
                     obj = gfycat.query_gfy(url_path[-1])
