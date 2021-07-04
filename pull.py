@@ -225,7 +225,6 @@ for who in all:
 
             print(" \_{}".format(path))
 
-            print(parts.netloc)
             if hasattr(entry, 'is_video') and entry.is_video and entry.secure_media is not None:
                 url_to_get = entry.secure_media['reddit_video']['fallback_url']
 
