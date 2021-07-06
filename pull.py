@@ -124,6 +124,7 @@ for who in all:
             path_tn = "tn/{}".format(swapped)
 
             if os.path.exists(path_tn) and not cksumcheck(path_tn, False):
+                os.unlink(path_tn)
                 os.unlink(path)
 
     if fail.get(who) and fail.get(who) > 3:
