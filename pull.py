@@ -9,6 +9,7 @@ import sys
 import pdb
 import hashlib
 import imagehash
+import re
 import argparse
 from glob import glob
 from PIL import Image
@@ -63,7 +64,7 @@ def get(url):
     request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
     return urllib.request.urlopen(request)
 
-def cksumcheck(path):
+def cksumcheck(path, doDelete=True):
     global cksum
     global ignore
 
@@ -89,9 +90,13 @@ def cksumcheck(path):
     if ihash in cksum and not ( filename in cksum[ihash] or cksum[ihash] in filename ):
         print("   == {} is {} ".format(filename, cksum.get(ihash)))
         ignore.add(path)
-        os.unlink(path)
+        if doDelete:
+            os.unlink(path)
+        return False
     else:
         cksum[ihash] = filename
+
+    return True
 
 if len(unknown) > 0:
     all = unknown
@@ -112,6 +117,14 @@ for who in all:
             filename = os.path.basename(path)
             if filename not in cksum_seen:
                 cksumcheck(path)
+
+        for path in glob("{}/*.mp4".format(content)):
+            flatten = re.sub('/', '_', path)
+            swapped = re.sub('.mp4', '.jpg', flatten)
+            path_tn = "tn/{}".format(swapped)
+
+            if os.path.exists(path_tn) and not cksumcheck(path_tn, False):
+                os.unlink(path)
 
     if fail.get(who) and fail.get(who) > 3:
         print(" -- {}".format(who))
