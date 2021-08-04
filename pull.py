@@ -56,7 +56,7 @@ def lf(path, kind = 'set'):
 
             return set(fp.read().splitlines())
 
-ignore = lf('ignore.txt') or set()
+ignore = lf('ignore.json', 'json') or {}
 fail = lf('fail.json', 'json') or {}
 cksum = lf('cksum.json', 'json') or {}
 
@@ -64,7 +64,7 @@ def get(url):
     request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
     return urllib.request.urlopen(request)
 
-def cksumcheck(path, doDelete=True):
+def cksumcheck(path, doDelete=True, who=None):
     global cksum
     global ignore
 
@@ -87,14 +87,14 @@ def cksumcheck(path, doDelete=True):
 
     ihash = str(ihash)
 
-    if ihash in cksum and not ( filename in cksum[ihash] or cksum[ihash] in filename ):
+    if ihash in cksum and not ( filename in cksum[ihash][1] or cksum[ihash][1] in filename ):
         print("   == {} is {} ".format(filename, cksum.get(ihash)))
-        ignore.add(path)
+        ignore[path] = ihash
         if doDelete:
             os.unlink(path)
         return False
     else:
-        cksum[ihash] = filename
+        cksum[ihash] = [who, filename]
 
     return True
 
@@ -116,14 +116,14 @@ for who in all:
         for path in glob("{}/*[jp][np]g".format(content)):
             filename = os.path.basename(path)
             if filename not in cksum_seen:
-                cksumcheck(path)
+                cksumcheck(path, who=who)
 
         for path in glob("{}/*.mp4".format(content)):
             flatten = re.sub('/', '_', path)
             swapped = re.sub('.mp4', '.jpg', flatten)
             path_tn = "tn/{}".format(swapped)
 
-            if os.path.exists(path_tn) and not cksumcheck(path_tn, False):
+            if os.path.exists(path_tn) and not cksumcheck(path_tn, doDelete=False, who=who):
                 os.unlink(path_tn)
                 os.unlink(path)
 
@@ -197,7 +197,7 @@ for who in all:
 
         path = "{}/{}".format(content, filename)
 
-        if filename in ignore:
+        if ignore.get(filename):
             logging.info("Ignoring: {}".format(filename))
             continue
 
@@ -229,7 +229,7 @@ for who in all:
                     urlparts = urlparse(imgurl)
                     path = "{}/{}".format(content, urlparts.path[1:])
 
-                    if not os.path.exists(path) and path not in ignore:
+                    if not os.path.exists(path) and not ignore.get(path):
                         remote = get(imgurl)
 
                         with open(path, 'bw') as f:
@@ -262,7 +262,7 @@ for who in all:
 
                 except:
                     print("   \_ Unable to get {}".format(entry.url))
-                    ignore.add(path)
+                    ignore[path] = "na"
                     continue
 
                 hasext = os.path.splitext(path)
@@ -281,7 +281,7 @@ for who in all:
 
                 except Exception as ex:
                     print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    ignore.add(path)
+                    ignore[path] = "na" 
                     continue
 
             try:
@@ -294,7 +294,7 @@ for who in all:
 
             except Exception as ex:
                 print("woops, can't get {} ({} -> {}): {}".format(entry.url, url_to_get, path, ex))
-                ignore.add(path)
+                ignore[path] = "na" 
                 continue
         else:
             # print("Exists: {}".format(filename))
@@ -306,10 +306,13 @@ for who in all:
                 path = attempt[0]
 
         if os.path.exists(path):
-            cksumcheck(path)
+            cksumcheck(path, who=who)
 
     with open('subreddits.json', 'w') as f:
         json.dump(subredMap, f)
+
+    with open("ignore.json".format(content), 'w') as f:
+        json.dump(ignore, f)
 
     with open("{}/commentmap.txt".format(content), 'w') as f:
         json.dump(commentMap, f)
@@ -319,10 +322,6 @@ for who in all:
 
     with open("{}/titlelist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(titlelist)))
-
-for i in ['ignore']:
-    with open(i + '.txt', 'w') as f:
-        f.write('\n'.join(list(globals().get(i))))
 
 
 for i in ['fail', 'cksum']:
