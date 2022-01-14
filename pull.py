@@ -35,7 +35,7 @@ gfycat = GfycatClient(
     secrets.gfycat['id'],
     secrets.gfycat['secret']
 )
-gfy_list = ['gfycat.com', 'redgifs.com', 'www.redgifs.com']
+gfy_list = ['gfycat.com', 'i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
 
 imgur = ImgurClient(
     secrets.imgur['id'],
@@ -111,7 +111,7 @@ if not os.path.isdir('data'):
 for who in all:
     content = "data/{}".format(who)
 
-    cksum_seen = list(cksum.values())
+    cksum_seen = list(map(lambda x: x[1], cksum.values()))
     if os.path.exists(content):
         for path in glob("{}/*[jp][np]g".format(content)):
             filename = os.path.basename(path)
@@ -206,7 +206,8 @@ for who in all:
         titlelist.add(entry.title)
 
         if parts.netloc in gfy_list:
-           path += '.mp4'
+            if '.' not in path: 
+                path += '.mp4'
 
         if not entry.url in urllist or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
 
@@ -274,9 +275,16 @@ for who in all:
 
             elif parts.netloc in gfy_list:
                 url_path = parts.path.split('/')
+                obj = None
                 try:
-                    obj = gfycat.query_gfy(url_path[-1])
+                    to_get = url_path[-1]
+                    to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
+                    to_get = re.sub('.jpg','',to_get)
+                    obj = gfycat.query_gfy(to_get)
                     url_to_get = obj.get('gfyItem').get('mp4Url')
+
+                    if url_to_get is None:
+                        url_to_get = obj.get('gfyItem').get('content_urls').get('large').get('url')
                     print("   \_{}".format(url_to_get))
 
                 except Exception as ex:
