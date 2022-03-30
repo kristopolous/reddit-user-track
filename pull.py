@@ -11,6 +11,7 @@ import hashlib
 import imagehash
 import re
 import argparse
+import photohash
 from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
@@ -71,6 +72,9 @@ def cksumcheck(path, doDelete=True, who=None):
     style = 'md5'
     ext = os.path.splitext(path)[1]
     filename = os.path.basename(path)
+    if not os.path.exists(path):
+        return False
+
     if ext in ['.jpg','.png']:
         try:
             ihash = imagehash.average_hash(Image.open(path))
@@ -96,7 +100,7 @@ def cksumcheck(path, doDelete=True, who=None):
     else:
         cksum[ihash] = [who, filename]
 
-    return True
+    return ihash
 
 if len(unknown) > 0:
     all = unknown
@@ -112,11 +116,48 @@ for who in all:
     content = "data/{}".format(who)
 
     cksum_seen = list(map(lambda x: x[1], cksum.values()))
+    cksum_rev = dict([ ('/'.join(y), x) for x,y in cksum.items() ])
     if os.path.exists(content):
-        for path in glob("{}/*[jp][np]g".format(content)):
+        # this is O(m*n), hate me later.
+        
+        existing = list(glob("{}/*[jp][np]g".format(content)))
+        for i in range(0, len(existing)):
+            path = existing[i]
             filename = os.path.basename(path)
+            cut_path = "{}/{}".format(who,filename)
+            is_new = False
+
             if filename not in cksum_seen:
-                cksumcheck(path, who=who)
+                ihash = cksumcheck(path, who=who)
+                is_new = True
+            else:
+                ihash = cksum_rev.get(cut_path)
+                is_new = True
+
+            if is_new:
+                dirty = False
+                for j in range(i + 1, len(existing)):
+                    path = existing[j]
+                    filename = os.path.basename(path)
+                    cut_path = "{}/{}".format(who,filename)
+
+                    if not cksum_rev.get(cut_path):
+                        dirty = True
+
+                    jhash = cksum_rev.get(cut_path) or cksumcheck(path, who=who)
+
+                    try:
+                        dist = photohash.hash_distance(ihash, jhash)
+                        if dist < 3:
+                            print("{} {} == {}".format(dist, existing[i], existing[j]))
+                            ignore[existing[j]] = 0
+                            if os.path.exists(existing[i]):
+                                os.unlink(existing[i])
+                    except:
+                        pass
+
+                if dirty:
+                    cksum_rev = dict([ ('/'.join(y), x) for x,y in cksum.items() ])
 
         for path in glob("{}/*.mp4".format(content)):
             flatten = re.sub('/', '_', path)
@@ -163,6 +204,10 @@ for who in all:
         fail[who] += 1
 
         print("Woops, no submissions {} ({})".format(who, fail[who]))
+
+        with open('fail.json', 'w') as f:
+            json.dump(fail, f)
+
         continue
 
     try:
@@ -319,9 +364,6 @@ for who in all:
     with open('subreddits.json', 'w') as f:
         json.dump(subredMap, f)
 
-    with open("ignore.json".format(content), 'w') as f:
-        json.dump(ignore, f)
-
     with open("{}/commentmap.txt".format(content), 'w') as f:
         json.dump(commentMap, f)
 
@@ -332,6 +374,6 @@ for who in all:
         fp.write('\n'.join(list(titlelist)))
 
 
-for i in ['fail', 'cksum']:
+for i in ['fail', 'cksum', 'ignore']:
     with open(i + '.json', 'w') as f:
         json.dump(globals().get(i), f)

@@ -84,19 +84,23 @@ $now = time();
 $res = [];
 $filter = false;
 
+if($use_fail) {
+  $filter = array_keys(json_decode(file_get_contents('fail.json'), true));
+}
+
 if($fm) {
   $fm = floatval($fm);
   $map = json_decode(file_get_contents('facemaster.json'), true);
+  $oldFilter = $filter;
   $filter = [];
+
   foreach($map as $k => $v) {
     if($v > $fm && $v < $fu) {
-      $filter[] = $k;
+      if(count($oldFilter) == 0 || in_array($k, $oldFilter)) {
+        $filter[] = $k;
+      }
     }
   }
-}
-
-if($use_fail) {
-  $filter = array_keys(json_decode(file_get_contents('fail.json'), true));
 }
 
 if(isset($userList)) {
@@ -158,7 +162,7 @@ $ix = 0;
 foreach($toShow as $user_short) {
   $is_first = true;
   $user = "data/$user_short";
-  if($filter && !in_array($user_short, $filter)) {
+  if($filter !== false && !in_array($user_short, $filter)) {
     continue;
   }
 
