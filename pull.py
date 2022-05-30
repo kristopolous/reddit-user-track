@@ -122,35 +122,34 @@ for who in all:
         
         existing = list(glob("{}/*[jp][np]g".format(content)))
         for i in range(0, len(existing)):
-            path = existing[i]
-            filename = os.path.basename(path)
+            ipath = existing[i]
+            filename = os.path.basename(ipath)
             cut_path = "{}/{}".format(who,filename)
             is_new = False
 
             if filename not in cksum_seen:
-                ihash = cksumcheck(path, who=who)
+                ihash = cksumcheck(ipath, who=who)
                 is_new = True
             else:
                 ihash = cksum_rev.get(cut_path)
-                is_new = True
 
             if is_new:
                 dirty = False
                 for j in range(i + 1, len(existing)):
-                    path = existing[j]
-                    filename = os.path.basename(path)
+                    jpath = existing[j]
+                    filename = os.path.basename(jpath)
                     cut_path = "{}/{}".format(who,filename)
 
                     if not cksum_rev.get(cut_path):
                         dirty = True
 
-                    jhash = cksum_rev.get(cut_path) or cksumcheck(path, who=who)
+                    jhash = cksum_rev.get(cut_path) or cksumcheck(jpath, who=who)
 
                     try:
                         dist = photohash.hash_distance(ihash, jhash)
                         if dist < 3:
                             print("{} {} == {}".format(dist, existing[i], existing[j]))
-                            ignore[existing[j]] = 0
+                            ignore[ipath] = ihash
                             if os.path.exists(existing[i]):
                                 os.unlink(existing[i])
                     except:
@@ -277,10 +276,13 @@ for who in all:
 
                     if not os.path.exists(path) and not ignore.get(path):
                         remote = get(imgurl)
+                        urllist.add(imgurl)
 
                         with open(path, 'bw') as f:
                             f.write(remote.read())
                         print("   \_{}".format(path))
+
+                urllist.add(entry.url)
                 continue
 
             print(" \_{}".format(path))
