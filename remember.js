@@ -15,9 +15,10 @@ function showall(who,el) {
         <source src="data/${who}/${asset}">
         </video>
         `;
+    } else if(ext == 'gif') {
+      html = `<a target=_blank onclick="vote('${who}',0.1)" href=data/${who}/${asset}><img src="data/${who}/${asset}"></a>`;
     } else {
       html = `<a target=_blank onclick="vote('${who}',0.1)" href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
-      console.log(html);
     }
     content.push(html);
   }
