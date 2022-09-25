@@ -13,4 +13,4 @@ done
 
 sort banlist.txt | uniq > /tmp/blist
 mv /tmp/blist banlist.txt
-./blockem.py
+#./blockem.py

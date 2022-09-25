@@ -2,6 +2,15 @@
 import praw
 import os
 import secrets
+import pdb
+import logging
+
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+for logger_name in ("praw", "prawcore"):
+      logger = logging.getLogger(logger_name)
+      logger.setLevel(logging.DEBUG)
+      logger.addHandler(handler)
 
 reddit = praw.Reddit(
     client_id=secrets.reddit['block']['id'], 
@@ -27,8 +36,8 @@ for who in all:
     try:
         reddit.redditor(who).block()
         blocked.append(who)
-    except:
-        print("hrmm ... can't find {}".format(who))
+    except Exception as ex:
+        print("hrmm ... can't find {} {}".format(who,ex))
 
 with open('blocked.txt', 'w') as f:
     f.write('\n'.join(list(blocked)))

@@ -1,4 +1,4 @@
-<!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css?3 /><script src=remember.js?2></script><div id=links>
+<!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css?4 /><script src=remember.js?2></script><div id=links>
 <?php
 
 include('lib.php');
@@ -96,7 +96,7 @@ if($fm) {
 
   foreach($map as $k => $v) {
     if($v > $fm && $v < $fu) {
-      if(count($oldFilter) == 0 || in_array($k, $oldFilter)) {
+      if(!$oldFilter || in_array($k, $oldFilter)) {
         $filter[] = $k;
       }
     }

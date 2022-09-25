@@ -12,6 +12,7 @@ $url = escapeshellarg($url);
 if (!file_exists("tn/$flatten_url")) {
   $tn = escapeshellarg("tn/$flatten_url");
   if ($isMovie) {
+    # frame grab
     shell_exec("ffmpeg -loglevel quiet -ss 1 -i $url -vframes 1 -q:v 6 $tn");
   } else {
     shell_exec("convert $url -resize 300x $tn");

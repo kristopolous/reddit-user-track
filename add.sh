@@ -7,4 +7,4 @@ while [[ -n "$1" ]]; do
   echo $1 add $(date) >> .log.txt
   shift
 done
-./blockem.py
+#./blockem.py
