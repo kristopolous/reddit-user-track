@@ -12,6 +12,7 @@ import imagehash
 import re
 import argparse
 import photohash
+import subprocess
 from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
@@ -184,6 +185,7 @@ for who in all:
         urllist = lf("{}/urllist.txt".format(content)) or set()
 
     titlelist = lf("{}/titlelist.txt".format(content)) or set()
+    subredUser = lf("{}/subreddit.txt".format(content), 'json') or dict()
     commentMap = lf("{}/commentmap.txt".format(content), 'json') or dict()
 
     try:
@@ -229,7 +231,11 @@ for who in all:
         if not subred in subredMap:
             subredMap[subred] = 0
 
+        if not subred in subredUser:
+            subredUser[subred] = 0
+
         subredMap[subred] += 1
+        subredUser[subred] += 1
 
         try:
             filename = os.path.basename(entry.url)
@@ -321,6 +327,7 @@ for who in all:
                 print("   \_{}".format(url_to_get))
 
             elif parts.netloc in gfy_list:
+                #pdb.set_trace()
                 url_path = parts.path.split('/')
                 obj = None
                 try:
@@ -336,7 +343,10 @@ for who in all:
 
                 except Exception as ex:
                     print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    ignore[path] = "na" 
+                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                    print("   \_ Got it another way")
+                    #    ignore[path] = "na" 
+                    urllist.add(entry.url)
                     continue
 
             try:
@@ -371,6 +381,9 @@ for who in all:
 
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
+
+    with open("{}/subreddit.txt".format(content), 'w') as fp:
+        json.dump(subredUser, fp)
 
     with open("{}/titlelist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(titlelist)))
