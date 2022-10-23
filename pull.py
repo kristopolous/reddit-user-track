@@ -14,12 +14,22 @@ import argparse
 import photohash
 import subprocess
 import redis
+import time
 from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
 from gfycat.client import GfycatClient
 from imgurpython import ImgurClient
 import pprint
+
+start = time.time()
+last = start
+def ts(w):
+    global start, last
+    now = time.time()
+    #print("{:10.4f} {:10.4f} {}".format(now - last, now - start, w))
+    last = now
+
 r = redis.Redis(host='localhost', port=6379, db=0,charset="utf-8", decode_responses=True)
 
 
@@ -35,17 +45,19 @@ reddit = praw.Reddit(
     password=secrets.reddit['pull']['password'], user_agent='test', 
     username=secrets.reddit['pull']['username']
 )
-
+ts('con:reddit')
 gfycat = GfycatClient(
     secrets.gfycat['id'],
     secrets.gfycat['secret']
 )
 gfy_list = ['gfycat.com', 'i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
+ts('con:gfy')
 
 imgur = ImgurClient(
     secrets.imgur['id'],
     secrets.imgur['secret']
 )
+ts('con:img')
 
 subredMap = {}
 
@@ -194,6 +206,7 @@ for who in all:
     subredUser = lf("{}/subreddit.txt".format(content), 'json') or dict()
     commentMap = lf("{}/commentmap.txt".format(content), 'json') or dict()
 
+    ts('pre sub pull')
     try:
         submissions = reddit.redditor(who).submissions.new()
     except:
@@ -201,7 +214,6 @@ for who in all:
         continue
 
     try:
-        submissions = list(submissions)
         if who in fail:
             del(fail[who])
 
@@ -217,21 +229,19 @@ for who in all:
 
         continue
 
+    ts('pre comment pull')
     try:
         comments = reddit.redditor(who).comments.new()
     except:
         print("comment issues for {}".format(who))
         continue
 
-    try:
-        comments = list(comments)
-    except:
-        print("comment issues for {}".format(who))
-        continue
-
     for entry in comments:
+        if entry.id in commentMap:
+            break
         commentMap[entry.id] = entry.body
 
+    ts('presub')
     for entry in submissions:
         subred = entry.subreddit.display_name
         if not subred in subredMap:
@@ -254,8 +264,7 @@ for who in all:
         path = "{}/{}".format(content, filename)
 
         if r.hget('ignore', filename):
-            print("Ignoring: {}".format(filename))
-            continue
+            break
 
         parts = urlparse(entry.url)
         url_to_get = entry.url
@@ -323,6 +332,7 @@ for who in all:
                 except:
                     print("   \_ Unable to get {}".format(entry.url))
                     r.hset('ignore', path, "na")
+                    r.hset('ignore', filename, "na")
                     continue
 
                 hasext = os.path.splitext(path)
@@ -366,6 +376,7 @@ for who in all:
             except Exception as ex:
                 print("   woops, can't get {} ({} -> {}): {}".format(entry.url, url_to_get, path, ex))
                 r.hset('ignore', path,  "na")
+                r.hset('ignore', filename, "na")
                 continue
         else:
             # print("Exists: {}".format(filename))
@@ -379,9 +390,7 @@ for who in all:
         if os.path.exists(path):
             cksumcheck(path, who=who)
 
-    with open('subreddits.json', 'w') as f:
-        json.dump(subredMap, f)
-
+    ts('prefile')
     with open("{}/commentmap.txt".format(content), 'w') as f:
         json.dump(commentMap, f)
 
@@ -398,3 +407,5 @@ for who in all:
 for i in ['fail']:
     with open(i + '.json', 'w') as f:
         json.dump(globals().get(i), f)
+
+ts('done')
