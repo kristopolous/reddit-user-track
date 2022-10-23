@@ -3,5 +3,7 @@
 today=$(date +%m%d%H)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
-flock -n /tmp/$today ./pull.py  || exit 0
+./pull.py > $HOME/last_output
+#flock -n /tmp/$today ./pull.py || exit 0
+echo $(whoami) $(date) $today $DIR >> $HOME/last_run
 #./redgif-pull.sh && touch last_run.txt

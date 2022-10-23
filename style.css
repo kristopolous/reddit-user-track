@@ -7,7 +7,7 @@ a:hover { color: #99f }
 body { font-size:0; margin: 0; padding: 0; background: #112; }
 video,img { vertical-align: top; width: 33% }
 div.wrap { width: 92% }
-div.inner {height:40vh; overflow-y:hidden; background: #000; }
+div.inner {height:60vh; overflow-y:hidden; background: #000; }
 div.inner.all {height:90vh;overflow-y:auto }
 .all video, .all img { width: 33.3%; }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }

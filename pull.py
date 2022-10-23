@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3 -OO
 import praw
 import logging
 import os
@@ -13,12 +13,15 @@ import re
 import argparse
 import photohash
 import subprocess
+import redis
 from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
 from gfycat.client import GfycatClient
 from imgurpython import ImgurClient
 import pprint
+r = redis.Redis(host='localhost', port=6379, db=0,charset="utf-8", decode_responses=True)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--force", help="Force", action='store_true')
@@ -58,21 +61,22 @@ def lf(path, kind = 'set'):
 
             return set(fp.read().splitlines())
 
-ignore = lf('ignore.json', 'json') or {}
 fail = lf('fail.json', 'json') or {}
-cksum = lf('cksum.json', 'json') or {}
 
 def get(url):
     request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
     return urllib.request.urlopen(request)
 
 def cksumcheck(path, doDelete=True, who=None):
-    global cksum
-    global ignore
+    filename = os.path.basename(path)
+    ihash = r.hget('cksum_rev', "{}/{}".format(who,filename))
+    if ihash:
+        return ihash
 
     style = 'md5'
     ext = os.path.splitext(path)[1]
-    filename = os.path.basename(path)
+
+    print("Summing {}/{}".format(who,path))
     if not os.path.exists(path):
         return False
 
@@ -92,14 +96,22 @@ def cksumcheck(path, doDelete=True, who=None):
 
     ihash = str(ihash)
 
-    if ihash in cksum and not ( filename in cksum[ihash][1] or cksum[ihash][1] in filename ):
-        print("   == {} is {} ".format(filename, cksum.get(ihash)))
-        ignore[path] = ihash
+    js = None
+    exists = r.hget('cksum',ihash)
+    if exists:
+        js = json.loads(exists)
+
+    if js and not ( filename in js[1] or js[1] in filename ):
+        print("   == {} is {} ".format(filename, exists))
+        r.hset('ignore', path, ihash)
         if doDelete:
             os.unlink(path)
         return False
     else:
-        cksum[ihash] = [who, filename]
+        r.hset('cksum', ihash, json.dumps([who, filename]))
+        r.sadd('cksum_seen', filename)
+        r.hset('cksum_rev', "{}/{}".format(who,filename), ihash)
+
 
     return ihash
 
@@ -116,11 +128,11 @@ if not os.path.isdir('data'):
 for who in all:
     content = "data/{}".format(who)
 
-    cksum_seen = list(map(lambda x: x[1], cksum.values()))
-    cksum_rev = dict([ ('/'.join(y), x) for x,y in cksum.items() ])
+    # if we've made the user path
     if os.path.exists(content):
         # this is O(m*n), hate me later.
         
+        """
         existing = list(glob("{}/*[jp][np]g".format(content)))
         for i in range(0, len(existing)):
             ipath = existing[i]
@@ -128,36 +140,29 @@ for who in all:
             cut_path = "{}/{}".format(who,filename)
             is_new = False
 
-            if filename not in cksum_seen:
+            if not r.sismember('cksum_seen', filename):
                 ihash = cksumcheck(ipath, who=who)
                 is_new = True
             else:
-                ihash = cksum_rev.get(cut_path)
+                ihash = r.hget('cksum_rev', cut_path)
 
             if is_new:
-                dirty = False
                 for j in range(i + 1, len(existing)):
                     jpath = existing[j]
                     filename = os.path.basename(jpath)
                     cut_path = "{}/{}".format(who,filename)
 
-                    if not cksum_rev.get(cut_path):
-                        dirty = True
-
-                    jhash = cksum_rev.get(cut_path) or cksumcheck(jpath, who=who)
+                    jhash = r.hget('cksum_rev',cut_path) or cksumcheck(jpath, who=who)
 
                     try:
                         dist = photohash.hash_distance(ihash, jhash)
                         if dist < 3:
                             print("{} {} == {}".format(dist, existing[i], existing[j]))
-                            ignore[ipath] = ihash
+                            r.hset('ignore', ipath, ihash)
                             if os.path.exists(existing[i]):
                                 os.unlink(existing[i])
                     except:
                         pass
-
-                if dirty:
-                    cksum_rev = dict([ ('/'.join(y), x) for x,y in cksum.items() ])
 
         for path in glob("{}/*.mp4".format(content)):
             flatten = re.sub('/', '_', path)
@@ -167,6 +172,7 @@ for who in all:
             if os.path.exists(path_tn) and not cksumcheck(path_tn, doDelete=False, who=who):
                 os.unlink(path_tn)
                 os.unlink(path)
+        """
 
     if fail.get(who) and fail.get(who) > 3:
         print(" -- {}".format(who))
@@ -247,8 +253,8 @@ for who in all:
 
         path = "{}/{}".format(content, filename)
 
-        if ignore.get(filename):
-            logging.info("Ignoring: {}".format(filename))
+        if r.hget('ignore', filename):
+            print("Ignoring: {}".format(filename))
             continue
 
         parts = urlparse(entry.url)
@@ -274,13 +280,13 @@ for who in all:
                         imgurl = v['s']['gif']
 
                     else:
-                        print("woops! Can't find an image: {}".format(v['s']))
+                        print("    woops! Can't find an image: {}".format(v['s']))
                         continue
 
                     urlparts = urlparse(imgurl)
                     path = "{}/{}".format(content, urlparts.path[1:])
 
-                    if not os.path.exists(path) and not ignore.get(path):
+                    if not os.path.exists(path) and not r.hget('ignore',path):
                         remote = get(imgurl)
                         urllist.add(imgurl)
 
@@ -316,7 +322,7 @@ for who in all:
 
                 except:
                     print("   \_ Unable to get {}".format(entry.url))
-                    ignore[path] = "na"
+                    r.hset('ignore', path, "na")
                     continue
 
                 hasext = os.path.splitext(path)
@@ -343,7 +349,7 @@ for who in all:
 
                 except Exception as ex:
                     print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                    subprocess.run(['/usr/local/bin/yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                     print("   \_ Got it another way")
                     #    ignore[path] = "na" 
                     urllist.add(entry.url)
@@ -358,8 +364,8 @@ for who in all:
                 urllist.add(entry.url)
 
             except Exception as ex:
-                print("woops, can't get {} ({} -> {}): {}".format(entry.url, url_to_get, path, ex))
-                ignore[path] = "na" 
+                print("   woops, can't get {} ({} -> {}): {}".format(entry.url, url_to_get, path, ex))
+                r.hset('ignore', path,  "na")
                 continue
         else:
             # print("Exists: {}".format(filename))
@@ -389,6 +395,6 @@ for who in all:
         fp.write('\n'.join(list(titlelist)))
 
 
-for i in ['fail', 'cksum', 'ignore']:
+for i in ['fail']:
     with open(i + '.json', 'w') as f:
         json.dump(globals().get(i), f)
