@@ -235,12 +235,6 @@ for who in all:
     except:
         continue
     for entry in submissions:
-        subred = entry.subreddit.display_name
-
-        if not subred in subredUser:
-            subredUser[subred] = 0
-
-        subredUser[subred] += 1
 
         try:
             filename = os.path.basename(entry.url)
@@ -264,11 +258,20 @@ for who in all:
         url_to_get = entry.url
         titlelist.add(entry.title)
 
+        if r.hget('ignore', path):
+            continue
+
         if parts.netloc in gfy_list:
             if '.' not in path: 
                 path += '.mp4'
 
-        if not entry.url in urllist or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
+        if not entry.url in urllist: #or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
+            subred = entry.subreddit.display_name
+
+            if not subred in subredUser:
+                subredUser[subred] = 0
+
+            subredUser[subred] += 1
 
             if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
                 if os.path.exists(path):
