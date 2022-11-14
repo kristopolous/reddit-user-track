@@ -59,8 +59,6 @@ imgur = ImgurClient(
 )
 ts('con:img')
 
-subredMap = {}
-
 
 def lf(path, kind = 'set'):
     if os.path.exists(path):
@@ -203,6 +201,7 @@ for who in all:
         urllist = lf("{}/urllist.txt".format(content)) or set()
 
     titlelist = lf("{}/titlelist.txt".format(content)) or set()
+    entrylist = lf("{}/entrylist.txt".format(content)) or set()
     subredUser = lf("{}/subreddit.txt".format(content), 'json') or dict()
     commentMap = lf("{}/commentmap.txt".format(content), 'json') or dict()
 
@@ -229,28 +228,18 @@ for who in all:
 
         continue
 
-    ts('pre comment pull')
-    try:
-        comments = reddit.redditor(who).comments.new()
-    except:
-        print("comment issues for {}".format(who))
-        continue
-
-    for entry in comments:
-        if entry.id in commentMap:
-            break
-        commentMap[entry.id] = entry.body
-
     ts('presub')
+    isNew = False
+    try:
+        submissions = list(submissions)
+    except:
+        continue
     for entry in submissions:
         subred = entry.subreddit.display_name
-        if not subred in subredMap:
-            subredMap[subred] = 0
 
         if not subred in subredUser:
             subredUser[subred] = 0
 
-        subredMap[subred] += 1
         subredUser[subred] += 1
 
         try:
@@ -263,9 +252,14 @@ for who in all:
 
         path = "{}/{}".format(content, filename)
 
-        if r.hget('ignore', filename):
+        """
+        if r.hget('ignore', filename) or entry.id in entrylist:
             break
+        """
 
+        entrylist.add(entry.id)
+
+        isNew = True
         parts = urlparse(entry.url)
         url_to_get = entry.url
         titlelist.add(entry.title)
@@ -343,7 +337,6 @@ for who in all:
                 print("   \_{}".format(url_to_get))
 
             elif parts.netloc in gfy_list:
-                #pdb.set_trace()
                 url_path = parts.path.split('/')
                 obj = None
                 try:
@@ -390,9 +383,31 @@ for who in all:
         if os.path.exists(path):
             cksumcheck(path, who=who)
 
+    if isNew:
+        ts('pre comment pull')
+        try:
+            for entry in reddit.redditor(who).comments.new():
+                if entry.id in commentMap:
+                    break
+
+                commentMap[entry.id] = entry.body
+
+                subred = entry.subreddit.display_name
+                if not subred in subredUser:
+                    subredUser[subred] = 0
+                subredUser[subred] += 1
+
+        except Exception as ex:
+            print("comment issues for {} {}".format(who, ex))
+            continue
+
+
     ts('prefile')
     with open("{}/commentmap.txt".format(content), 'w') as f:
         json.dump(commentMap, f)
+
+    with open("{}/entrylist.txt".format(content), 'w') as fp:
+        fp.write('\n'.join(list(entrylist)))
 
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))

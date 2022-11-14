@@ -137,7 +137,28 @@ if ($qstr) {
       $doc = file_get_contents("data/$user/titlelist.txt");
       $match = !!strlen($doc);
       foreach($regParts as $sub) {
-        $match &= preg_match_all($sub, $doc, $matches);
+        $match = preg_match_all($sub, $doc, $matches);
+        if(!$match) { 
+          break;
+        }
+        if(!array_key_exists($user, $matchMap)) {
+          $matchMap[$user] = [];
+        }
+        foreach(array_slice($matches[0], 0, 3) as $line) {
+
+          $matchMap[$user][] = $line;
+        }
+      }
+    }
+    if(!$match) {
+      if (!file_exists("data/$user/commentmap.txt")) {
+        continue;
+      }
+      $doc = file_get_contents("data/$user/commentmap.txt");
+      $j_doc = json_decode($doc, true);
+      $doc = implode("\n", array_values($j_doc));
+      foreach($regParts as $sub) {
+        $match = preg_match_all($sub, $doc, $matches);
         if(!$match) { 
           break;
         }
