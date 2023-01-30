@@ -142,7 +142,6 @@ for who in all:
     if os.path.exists(content):
         # this is O(m*n), hate me later.
         
-        """
         existing = list(glob("{}/*[jp][np]g".format(content)))
         for i in range(0, len(existing)):
             ipath = existing[i]
@@ -182,7 +181,6 @@ for who in all:
             if os.path.exists(path_tn) and not cksumcheck(path_tn, doDelete=False, who=who):
                 os.unlink(path_tn)
                 os.unlink(path)
-        """
 
     if fail.get(who) and fail.get(who) > 3:
         print(" -- {}".format(who))
@@ -355,7 +353,7 @@ for who in all:
 
                 except Exception as ex:
                     print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    subprocess.run(['/usr/local/bin/yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                    subprocess.run(['youtube-dl', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                     print("   \_ Got it another way")
                     #    ignore[path] = "na" 
                     urllist.add(entry.url)

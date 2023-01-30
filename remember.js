@@ -1,3 +1,4 @@
+var _ban = false;
 function showall(who,el) {
   if(who in showall) {
     return;
@@ -16,9 +17,9 @@ function showall(who,el) {
         </video>
         `;
     } else if(ext == 'gif') {
-      html = `<a target=_blank onclick="vote('${who}',0.1)" href=data/${who}/${asset}><img src="data/${who}/${asset}"></a>`;
+      html = `<a target=_blank onclick="vote('${who}',0.1,this)" href=data/${who}/${asset}><img src="data/${who}/${asset}"></a>`;
     } else {
-      html = `<a target=_blank onclick="vote('${who}',0.1)" href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
+      html = `<a target=_blank onclick="vote('${who}',0.1,this)" href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
     }
     content.push(html);
   }
@@ -28,6 +29,11 @@ function showall(who,el) {
 
 // dir can also be amount
 function vote(who, dir, el) {
+  if (_ban) {
+    el.style.display = 'none';
+    fetch(`remove.php?path=${el.href}`);
+    return;
+  }
   if (dir) {
     if(!(who in db)) {
       db[who] = 0;
@@ -35,12 +41,18 @@ function vote(who, dir, el) {
     db[who] = (parseFloat(db[who], 10) || 0) + dir;
     fetch(`vote.php?who=${who}&what=${db[who]}`);
   } 
-  if(el) {
+  if(dir != 0.1 && el) {
     el.parentNode.getElementsByTagName('b')[0].innerHTML = db[who];
   }
 
   return db[who] || 0;
 }
+
+function toggle (el) {
+  el.classList.toggle('active');
+  document.body.classList.toggle('active');
+  _ban = el.classList.contains('active')
+} 
 
 window.onload = function() {
   let cont = document.getElementById('content');
@@ -55,12 +67,18 @@ window.onload = function() {
      
      controls.innerHTML = `
        <b>${parseFloat(count).toFixed(2)}</b>
-       <a onclick=showall("${user}",this)>${user}</a>
-       <a onclick=vote("${user}",1,this)>&#9650;</a> - 
-       <a onclick=vote("${user}",-1,this)>&#9660;</a> 
-       ${last} ( ${days} ) <a class='profile-link' href="https://reddit.com/u/${user}">profile</a>
+       <a onclick=showall("${user}",this)>${user}</a>`
+       + ( 
+           window.autoexpand ? '' : 
+         `<a onclick=vote("${user}",1,this)>&#9650;</a> - 
+          <a onclick=vote("${user}",-1,this)>&#9660;</a> `
+       ) + `${last} ( ${days} ) <a class='profile-link' href="https://reddit.com/u/${user}">profile</a>
        <a class='profile-link' target=_blank href="comment.php?u=${user}">comments</a>
      `;
+
+     if(window.autoexpand) {
+       showall(user, controls.firstChild);
+     }
 
      content.push([count, r]);
      cont.removeChild(r);

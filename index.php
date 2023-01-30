@@ -18,6 +18,10 @@ $fu = $_GET['fu'] ?? 1.0;
 $userList = $_GET['users'] ?? $_GET['user'] ?? $_GET['userlist'] ?? null;
 $matchMap = [];
 
+if ($userList) {
+  echo "<script>window.autoexpand=true</script>";
+}
+
 if ($format === '*') {
   $perPage = 30;
 } else {
@@ -44,31 +48,32 @@ if(!empty($userList)) {
 }
 
 $prev = false;
-foreach([2,8,24,48,96,24*7,24*7*3,24*7*8,24*7*24] as $t) {
-  if ($t > 48) {
-    if ($t > 24 * 14) {
-      $unit = $t / (24 * 7) . " week";
+if(!$userList) {
+  foreach([2,8,24,48,96,24*7,24*7*3,24*7*8,24*7*24] as $t) {
+    if ($t > 48) {
+      if ($t > 24 * 14) {
+        $unit = $t / (24 * 7) . " week";
+      } else {
+        $unit = $t / 24 . " days";
+      }
     } else {
-      $unit = $t / 24 . " days";
+      $unit = "$t hour";
     }
-  } else {
-    $unit = "$t hour";
-  }
-  
-  $klass = ($last == $t) ? 'class=active ' : '';
-  $link = dolink(['last' => $t, 'newest' => $prev]);
+    
+    $klass = ($last == $t) ? 'class=active ' : '';
+    $link = dolink(['last' => $t, 'newest' => $prev]);
 
-  echo "<a ${klass}href='$link'>$unit</a>";
-  $prev = $t;
-}
-$klass = '';
-if($last == 'all') { 
-  $klass = 'class=active ';
-  if(empty($_GET['last'])) { 
-    $last = 24 * 365 * 20;
+    echo "<a ${klass}href='$link'>$unit</a>";
+    $prev = $t;
   }
-}
-echo "<a ${klass}href='" . dolink(['last' => 'all']) . "'>all</a>";
+  $klass = '';
+  if($last == 'all') { 
+    $klass = 'class=active ';
+    if(empty($_GET['last'])) { 
+      $last = 24 * 365 * 20;
+    }
+  }
+  echo "<a ${klass}href='" . dolink(['last' => 'all']) . "'>all</a>";
 ?>
 <form>
 <input name=last type=hidden value=<?= $last ?>>
@@ -76,6 +81,7 @@ echo "<a ${klass}href='" . dolink(['last' => 'all']) . "'>all</a>";
 <input name=q placeholder=query value="<?= $qstr ?>">
 <button>go</button>
 </form>
+<?php } ?>
 </div>
 <div id=content>
 <?php
@@ -255,7 +261,12 @@ foreach($toShow as $user_short) {
     echo "</div>";
   }
 }
-echo "</div><div id=paging>";
+?>
+</div>
+<div onclick=toggle(this) id=banit>X</div>
+<div id=paging>
+<?php
+
 if($page > 0) {
   echo "<a href=" . dolink(['page' => $page - 1]) . ">prev</a>";
 }

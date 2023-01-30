@@ -1,31 +1,29 @@
 #!/usr/bin/env python3
-import json,os
-def lf(path, kind = 'set'):
-    if os.path.exists(path):
-        with open(path) as fp:
-            if kind == 'json':
-                try:
-                    return json.load(fp)
-                except:
-                    return {}
+import redis
+r = redis.Redis(host='localhost', port=6379, db=0,charset="utf-8", decode_responses=True)
+import json
 
-            return set(fp.read().splitlines())
+hdict = {}
+for k,v in r.hgetall('cksum').items():
+    v = json.loads(v)
+    if k not in hdict:
+        hdict[k] = []
+    hdict[k].append(v[0])
 
-ignore = lf('ignore.json', 'json') or {}
-cksum = lf('cksum.json', 'json') or {}
-usermap = {}
 
-for k,v in ignore.items():
+for k,v in r.hgetall('ignore').items():
     parts = k.split('/')
-    if len(parts) == 3:
-       user = parts[1]
 
-       if user not in usermap:
-            usermap[user] = {}
+    if len(parts) > 1:
+        if parts[0] == 'data':
+            user = parts[1]
+    if v not in hdict:
+        hdict[v] = []
 
-       
-       if cksum.get(v) and user != cksum[v][0]:
-           print(user,cksum[v])
+    hdict[v].append(user)
 
-        # print(cksum[v])
-            
+for k,v in hdict.items():
+    v = set(v)
+    if len(v) > 1:
+        print(list(sorted(list(v))))
+

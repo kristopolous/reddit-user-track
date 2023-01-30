@@ -16,7 +16,7 @@ def lf(path):
             except:
                 return {}
 
-for userPath in glob.glob('data/*'):
+for userPath in sorted(glob.glob('data/*')):
     user = os.path.basename(userPath)
     if not os.path.isdir(userPath):
         continue

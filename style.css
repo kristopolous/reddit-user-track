@@ -5,6 +5,7 @@ a:hover { color: #99f }
 #links a.active { background: rgba(170,170,204,.5); color: #fff }
 #links a:hover { background: #aac; color: #000 }
 body { font-size:0; margin: 0; padding: 0; background: #112; }
+body.active { background: #800 }
 video,img { vertical-align: top; width: 33% }
 div.wrap { width: 92% }
 div.inner {height:60vh; overflow-y:hidden; background: #000; }
@@ -45,6 +46,8 @@ button,input {
   color: #aaa;
 }
 a.profile-link { font-size:16px }
+#banit { position: fixed; top:0; right: 0; background: #222; font-size:1.4vw;cursor:pointer;font-family:sans-serif;padding: 0.5rem;color:#eee}
+#banit.active { background: #f22;color:#400 }
 
 
 @media only screen and (max-width: 768px){

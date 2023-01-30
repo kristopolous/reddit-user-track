@@ -11,7 +11,7 @@ glob('data/*/subreddit.txt', {}, (err, fileList) => {
       if(! (key in scoreMap) ) {
         scoreMap[key] = 0;
       }
-      scoreMap[key] += subMap[key];
+      scoreMap[key] += 1;//Math.min(25, subMap[key]);
     }
   });
 
