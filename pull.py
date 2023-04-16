@@ -275,12 +275,21 @@ for who in all:
                         path = "{}/{}".format(content, urlparts.path[1:])
 
                         if not os.path.exists(path) and not r.hget('ignore',path):
-                            remote = get(imgurl)
+                            try:
+                                remote = get(imgurl)
+                            except:
+                                logging.warning("Cannot grab path {} for text {}".format(imgurl, entry.selftext))
+                                continue
+
                             urllist.add(imgurl)
 
-                            with open(path, 'bw') as f:
-                                f.write(remote.read())
-                                print("   \_{}".format(path))
+                            try:
+                                with open(path, 'bw') as f:
+                                    f.write(remote.read())
+                                    print("   \_{}".format(path))
+                            except:
+                                logging.warning("Can't open path {} for text {} to save {}".format(path, entry.selftext, imgurl))
+
 
                 logging.debug("Filename doesn't exist for {}".format(entry.id))
                 continue
