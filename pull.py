@@ -32,7 +32,7 @@ def ts(w):
 
 r = redis.Redis(host='localhost', port=6379, db=0,charset="utf-8", decode_responses=True)
 
-
+logging.basicConfig(level=os.getenv('LOGLEVEL') or 'WARNING')
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--force", help="Force", action='store_true')
 parser.add_argument("-g", "--gallery", help="Get the galleries again", action='store_true')
@@ -237,10 +237,9 @@ for who in all:
         try:
             filename = os.path.basename(entry.url)
         except:
+            logging.debug("Couldn't get path for {}".format(entry.url))
             continue
 
-        if len(filename) == 0:
-            continue
 
         path = "{}/{}".format(content, filename)
 
@@ -264,6 +263,28 @@ for who in all:
                 path += '.mp4'
 
         if not entry.url in urllist: #or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
+            if len(filename) == 0:
+                
+                titlelist.add(entry.selftext)
+                urllist.add(entry.url)
+                linklist = re.findall(r'http[^\s]*', entry.selftext)
+                if len(linklist) > 0:
+
+                    for imgurl in linklist:
+                        urlparts = urlparse(imgurl)
+                        path = "{}/{}".format(content, urlparts.path[1:])
+
+                        if not os.path.exists(path) and not r.hget('ignore',path):
+                            remote = get(imgurl)
+                            urllist.add(imgurl)
+
+                            with open(path, 'bw') as f:
+                                f.write(remote.read())
+                                print("   \_{}".format(path))
+
+                logging.debug("Filename doesn't exist for {}".format(entry.id))
+                continue
+
             subred = entry.subreddit.display_name
 
             if not subred in subredUser:
@@ -272,6 +293,7 @@ for who in all:
             subredUser[subred] += 1
 
             if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
+                logging.debug("is a gallery")
                 if os.path.exists(path):
                     print("<< {}".format(path))
                     os.unlink(path)
@@ -297,7 +319,7 @@ for who in all:
                         with open(path, 'bw') as f:
                             f.write(remote.read())
                         print("   \_{}".format(path))
-
+                        
                 urllist.add(entry.url)
                 continue
 
@@ -373,15 +395,14 @@ for who in all:
                 r.hset('ignore', filename, "na")
                 continue
         else:
-            # print("Exists: {}".format(filename))
-            pass
+            logging.debug("Exists: {}".format(filename))
 
         if not os.path.exists(path):
             attempt = glob("{}.*".format(path))
             if len(attempt) > 0:
                 path = attempt[0]
 
-        if os.path.exists(path):
+        if os.path.isfile(path):
             cksumcheck(path, who=who)
 
     if isNew:
