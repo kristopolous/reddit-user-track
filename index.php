@@ -187,6 +187,9 @@ if ($qstr) {
 
 $ix = 0;
 foreach($toShow as $user_short) {
+  if($db[$user_short] < -3) {
+    continue;
+  }
   $is_first = true;
   $user = "data/$user_short";
   if($filter !== false && !in_array($user_short, $filter)) {

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+total=$(ls data/*/*.gif | wc -l)
+count=0
+for i in data/*/*.gif; do
+  ffmpeg -loglevel -3 -i "${i}" -crf 27 "${i/gif/mp4}"
+  [[ -s "${i/gif/mp4}" ]] && rm -- "${i}"
+  echo $count $total
+  (( count++ ))
+done

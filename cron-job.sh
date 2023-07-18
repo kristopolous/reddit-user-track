@@ -4,7 +4,7 @@ today=$(date +%m%d%H)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 . secrets.sh
-timeout 30m ./pull.py > $HOME/last_output
+timeout 45m ./pull.py > $HOME/last_output
 ./facer.py
 
 for i in ${subs[@]}; do

@@ -18,7 +18,6 @@ import time
 from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
-from gfycat.client import GfycatClient
 from imgurpython import ImgurClient
 import pprint
 
@@ -46,17 +45,31 @@ reddit = praw.Reddit(
     username=secrets.reddit['pull']['username']
 )
 ts('con:reddit')
-gfycat = GfycatClient(
-    secrets.gfycat['id'],
-    secrets.gfycat['secret']
-)
-gfy_list = ['gfycat.com', 'i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
+
+try:
+    from gfycat.client import GfycatClient
+    gfycat = GfycatClient(
+        secrets.gfycat['id'],
+        secrets.gfycat['secret']
+    )
+    gfy_list = ['gfycat.com', 'i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
+
+except:
+    gfycat = None
+    gfy_list = []
+    logging.warning("GFYCAT failed to load")
+
 ts('con:gfy')
 
-imgur = ImgurClient(
-    secrets.imgur['id'],
-    secrets.imgur['secret']
-)
+try:
+    imgur = ImgurClient(
+        secrets.imgur['id'],
+        secrets.imgur['secret']
+    )
+except:
+    imgur = None
+    logging.warning("IMGUR failed to load")
+
 ts('con:img')
 
 
@@ -267,11 +280,16 @@ for who in all:
                 
                 titlelist.add(entry.selftext)
                 urllist.add(entry.url)
-                linklist = re.findall(r'http[^\s]*', entry.selftext)
+                linklist = re.findall(r'http[^\s\])]*', entry.selftext)
                 if len(linklist) > 0:
 
                     for imgurl in linklist:
-                        urlparts = urlparse(imgurl)
+                        try:
+                            urlparts = urlparse(imgurl)
+                        except:
+                            logging.warning("Failed to parse url: {}".format(imgurl))
+                            continue
+
                         path = "{}/{}".format(content, urlparts.path[1:])
 
                         if not os.path.exists(path) and not r.hget('ignore',path):
@@ -308,14 +326,19 @@ for who in all:
                     os.unlink(path)
 
                 for k,v in entry.media_metadata.items():
-                    if 'u' in v['s']:
-                        imgurl = v['s']['u']
+                    try:
+                        vs = v.get('s') or {}
+                        if 'u' in vs:
+                            imgurl = vs['u']
 
-                    elif 'gif' in v['s']:
-                        imgurl = v['s']['gif']
+                        elif 'gif' in vs:
+                            imgurl = vs['gif']
 
-                    else:
-                        print("    woops! Can't find an image: {}".format(v['s']))
+                        else:
+                            print("    woops! Can't find an image: {}".format(v['s']))
+                            continue
+                    except:
+                        print("    woops! Can't find an image".format(json.dumps(v)))
                         continue
 
                     urlparts = urlparse(imgurl)

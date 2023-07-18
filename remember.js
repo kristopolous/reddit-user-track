@@ -12,7 +12,7 @@ function showall(who,el) {
     let ext = asset.split('.').pop();
     if(ext == 'mp4' || ext == 'gifv') {
       html = ` 
-        <video poster="tnail.php?url=data/${who}/${asset}" preload=none loop muted='' controls class=video muted="">
+        <video onclick=mayberemove(this) poster="tnail.php?url=data/${who}/${asset}" preload=none loop muted='' controls class=video muted="">
         <source src="data/${who}/${asset}">
         </video>
         `;
@@ -26,6 +26,15 @@ function showall(who,el) {
   handler.classList.add('all');
   handler.innerHTML = content.join('');
 }
+
+function mayberemove(what) {
+  if (_ban) {
+    what.style.display = 'none';
+    fetch(`remove.php?path=${what.children.item(0).src}`);
+    return;
+  }
+}
+
 
 // dir can also be amount
 function vote(who, dir, el) {
