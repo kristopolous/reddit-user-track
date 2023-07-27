@@ -99,7 +99,7 @@ def cksumcheck(path, doDelete=True, who=None):
     style = 'md5'
     ext = os.path.splitext(path)[1]
 
-    print("Summing {}/{}".format(who,path))
+    print("    Summing {}/{}".format(who,path))
     if not os.path.exists(path):
         return False
 
@@ -319,13 +319,27 @@ for who in all:
 
             subredUser[subred] += 1
 
-            if hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None:
+            remote_temp = None
+            try:
+                remote_temp = hasattr(entry, 'is_gallery') and entry.is_gallery and entry.gallery_data is not None
+            except:
+                logging.warning("Unable to get gallery for user. Might need to wait. Snoozing a bit")
+                time.sleep(2)
+
+
+            if remote_temp:
                 logging.debug("is a gallery")
                 if os.path.exists(path):
                     print("<< {}".format(path))
                     os.unlink(path)
 
-                for k,v in entry.media_metadata.items():
+                try:
+                    items_temp = entry.media_metadata.items()
+                except Exception as ex:
+                    logging.warning("Unable to get meta-data: {}".format(ex))
+                    items_temp = {}
+
+                for k,v in items_temp:
                     try:
                         vs = v.get('s') or {}
                         if 'u' in vs:
@@ -398,6 +412,7 @@ for who in all:
                     to_get = url_path[-1]
                     to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
                     to_get = re.sub('.jpg','',to_get)
+                    raise Exception("api broken")
                     obj = gfycat.query_gfy(to_get)
                     url_to_get = obj.get('gfyItem').get('mp4Url')
 
@@ -407,7 +422,7 @@ for who in all:
 
                 except Exception as ex:
                     print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    subprocess.run(['youtube-dl', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                     print("   \_ Got it another way")
                     #    ignore[path] = "na" 
                     urllist.add(entry.url)
