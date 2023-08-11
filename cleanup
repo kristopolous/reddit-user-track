@@ -5,7 +5,7 @@ gif2mp4() {
   count=0
   for i in data/*/*.gif; do
     new="${i/gif/mp4}"
-    ffmpeg -loglevel -3 -i "${i}" -crf 27 "${new}"
+    ffmpeg -y -loglevel -3 -i "${i}" -crf 27 "${new}"
     [[ -s "${i/gif/mp4}" ]] && rm -- "${i}"
     echo $count $total "$i -> $new"
     (( count++ ))

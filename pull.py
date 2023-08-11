@@ -99,7 +99,7 @@ def cksumcheck(path, doDelete=True, who=None):
     style = 'md5'
     ext = os.path.splitext(path)[1]
 
-    print("    Summing {}/{}".format(who,path))
+    print("   Summing {}/{}".format(who,path))
     if not os.path.exists(path):
         return False
 
@@ -422,7 +422,7 @@ for who in all:
 
                 except Exception as ex:
                     print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                    subprocess.run(['/usr/local/bin/yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                     print("   \_ Got it another way")
                     #    ignore[path] = "na" 
                     urllist.add(entry.url)
