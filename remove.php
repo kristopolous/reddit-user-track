@@ -1,4 +1,5 @@
 <?php
 
 $path = $_GET['path'];
-unlink($_SERVER['DOCUMENT_ROOT'] . '/' . parse_url($path, PHP_URL_PATH));
+$dir = dirname($_SERVER['SCRIPT_FILENAME']);
+unlink($dir . '/' . parse_url($path, PHP_URL_PATH));

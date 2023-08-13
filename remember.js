@@ -17,9 +17,9 @@ function showall(who,el) {
         </video>
         `;
     } else if(ext == 'gif') {
-      html = `<a target=_blank onclick="vote('${who}',0.1,this)" href=data/${who}/${asset}><img src="data/${who}/${asset}"></a>`;
+      html = `<a target=_blank onclick="vote('${who}',0.1,this)" data-href=data/${who}/${asset}><img src="data/${who}/${asset}"></a>`;
     } else {
-      html = `<a target=_blank onclick="vote('${who}',0.1,this)" href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
+      html = `<a target=_blank onclick="vote('${who}',0.1,this)" data-href=data/${who}/${asset}><img src="tnail.php?url=data/${who}/${asset}"></a>`;
     }
     content.push(html);
   }
@@ -40,8 +40,11 @@ function mayberemove(what) {
 function vote(who, dir, el) {
   if (_ban) {
     el.style.display = 'none';
-    fetch(`remove.php?path=${el.href}`);
+    fetch(`remove.php?path=${el.dataset.href}`);
     return;
+  }
+  else if(el){
+    window.open(el.dataset.href);
   }
   if (dir) {
     if(!(who in db)) {
