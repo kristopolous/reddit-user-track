@@ -11,7 +11,7 @@ timeout=2m
 for i in $(ls data/); do
   (( n++ ))
   who=$(basename $i)
-  if (( n % 8 == 0 )); then
+  if (( n % 10 == 0 )); then
     ( timeout $timeout ./pull.py $names >> $HOME/last_output 2>&1 ) &
     sleep 10
     names=''

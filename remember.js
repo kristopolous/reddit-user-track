@@ -43,7 +43,7 @@ function vote(who, dir, el) {
     fetch(`remove.php?path=${el.dataset.href}`);
     return;
   }
-  else if(el){
+  else if(el && el.dataset.href){
     window.open(el.dataset.href);
   }
   if (dir) {
