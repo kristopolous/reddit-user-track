@@ -187,7 +187,7 @@ if ($qstr) {
 
 $ix = 0;
 foreach($toShow as $user_short) {
-  if($db[$user_short] < -3) {
+  if($db[$user_short] < -3 && !$userList) {
     continue;
   }
   $is_first = true;
