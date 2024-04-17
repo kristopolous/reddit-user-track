@@ -1,7 +1,7 @@
 praw
 redis
 imagehash
-git+https://github.com/kristopolous/py-gfycat@0cea1adcc2a81769df796559e1c332df3b50e289
+git+https://github.com/kristopolous/py-gfycat
 imgurpython
 photohash
 yt-dlp

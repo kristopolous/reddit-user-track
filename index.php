@@ -199,7 +199,7 @@ foreach($toShow as $user_short) {
   $row = [];
   $count = 0;
   $list = glob("$user/*.$format");
-  usort($list, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
+  usort($list, function($a,$b) { return filemtime($b) - filemtime($a);});
   if ($min > count($list) || count($list) > $max ) {
     continue;
   }

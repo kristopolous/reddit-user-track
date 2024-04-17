@@ -3,7 +3,7 @@ import praw
 import logging
 import os
 import urllib
-import secrets
+import mysecrets
 import json
 import sys
 import pdb
@@ -19,6 +19,7 @@ from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
 from imgurpython import ImgurClient
+from datetime import datetime
 import pprint
 
 start = time.time()
@@ -39,32 +40,33 @@ parser.add_argument("-v", "--video", help="Get the video again", action='store_t
 args, unknown = parser.parse_known_args()
 
 reddit = praw.Reddit(
-    client_id=secrets.reddit['pull']['id'], 
-    client_secret=secrets.reddit['pull']['secret'], 
-    password=secrets.reddit['pull']['password'], user_agent='test', 
-    username=secrets.reddit['pull']['username']
+    client_id=mysecrets.reddit['pull']['id'], 
+    client_secret=mysecrets.reddit['pull']['secret'], 
+    password=mysecrets.reddit['pull']['password'], user_agent='test', 
+    username=mysecrets.reddit['pull']['username']
 )
 ts('con:reddit')
 
 try:
     from gfycat.client import GfycatClient
     gfycat = GfycatClient(
-        secrets.gfycat['id'],
-        secrets.gfycat['secret']
+        mysecrets.gfycat['id'],
+        mysecrets.gfycat['secret'],
+        default_endpoint='api.redgifs.com'
     )
     gfy_list = ['gfycat.com', 'i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
 
-except:
+except Exception as a:
     gfycat = None
     gfy_list = []
-    logging.warning("GFYCAT failed to load")
+    logging.warning("GFYCAT failed to load {}".format(a))
 
 ts('con:gfy')
 
 try:
     imgur = ImgurClient(
-        secrets.imgur['id'],
-        secrets.imgur['secret']
+        mysecrets.imgur['id'],
+        mysecrets.imgur['secret']
     )
 except:
     imgur = None
@@ -213,7 +215,7 @@ for who in all:
 
     titlelist = lf("{}/titlelist.txt".format(content)) or set()
     entrylist = lf("{}/entrylist.txt".format(content)) or set()
-    subredUser = lf("{}/subreddit.txt".format(content), 'json') or dict()
+    subredUser = lf("{}/subredditlist.txt".format(content), 'json') or []
     commentMap = lf("{}/commentmap.txt".format(content), 'json') or dict()
 
     ts('pre sub pull')
@@ -290,7 +292,7 @@ for who in all:
                             logging.warning("Failed to parse url: {}".format(imgurl))
                             continue
 
-                        path = "{}/{}".format(content, urlparts.path[1:])
+                        path = "{}/{}".format(content, os.path.basename(urlparts.path)) 
 
                         if not os.path.exists(path) and not r.hget('ignore',path):
                             try:
@@ -314,10 +316,7 @@ for who in all:
 
             subred = entry.subreddit.display_name
 
-            if not subred in subredUser:
-                subredUser[subred] = 0
-
-            subredUser[subred] += 1
+            subredUser.append([datetime.now().strftime("%Y%m%d"), subred])
 
             remote_temp = None
             try:
@@ -462,9 +461,7 @@ for who in all:
                 commentMap[entry.id] = entry.body
 
                 subred = entry.subreddit.display_name
-                if not subred in subredUser:
-                    subredUser[subred] = 0
-                subredUser[subred] += 1
+                subredUser.append([datetime.now().strftime("%Y%m%d"), subred])
 
         except Exception as ex:
             print("comment issues for {} {}".format(who, ex))
@@ -481,7 +478,7 @@ for who in all:
     with open("{}/urllist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(urllist)))
 
-    with open("{}/subreddit.txt".format(content), 'w') as fp:
+    with open("{}/subredditlist.txt".format(content), 'w') as fp:
         json.dump(subredUser, fp)
 
     with open("{}/titlelist.txt".format(content), 'w') as fp:
