@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 import praw
 import os
-import secrets
+import mysecrets
 import json
 import sys
 import pdb
 reddit = praw.Reddit(
-    client_id=secrets.reddit['block']['id'], 
-    client_secret=secrets.reddit['block']['secret'], 
-    password=secrets.reddit['block']['password'], user_agent='test', 
-    username=secrets.reddit['block']['username']
+    client_id=mysecrets.reddit['block']['id'], 
+    client_secret=mysecrets.reddit['block']['secret'], 
+    password=mysecrets.reddit['block']['password'], user_agent='test', 
+    username=mysecrets.reddit['block']['username']
 )
 
 def lf(path, kind = 'set'):
