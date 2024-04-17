@@ -7,13 +7,15 @@ cd $DIR
 truncate --size 0 last_output
 n=0
 names=''
-timeout=2m
-for i in $(ls data/); do
+timeout=5m
+find data -size 0c -name \*.jpg -exec rm {} \;
+
+for i in $(ls data/ | shuf); do
   (( n++ ))
-  who=$(basename $i)
-  if (( n % 10 == 0 )); then
+  who=$(basename -- "$i")
+  if (( n % 5 == 0 )); then
     ( timeout $timeout ./pull.py $names >> last_output 2>&1 ) &
-    sleep 10
+    sleep 6 
     names=''
   else
     names="$names $i"
@@ -24,7 +26,7 @@ if [[ -n "$names" ]]; then
   timeout $timeout ./pull.py $names >> last_output 2>&1
 fi
 
-./facer.py
+./facer.py &
 
 for i in ${subs[@]}; do
   ./sub.py $i
