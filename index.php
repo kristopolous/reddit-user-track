@@ -23,7 +23,7 @@ if ($userList) {
 }
 
 if ($format === '*') {
-  $perPage = 30;
+  $perPage = 15;
 } else {
   $perPage = 5;
 }

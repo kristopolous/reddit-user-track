@@ -13,9 +13,9 @@ find data -size 0c -name \*.jpg -exec rm {} \;
 for i in $(ls data/ | shuf); do
   (( n++ ))
   who=$(basename -- "$i")
-  if (( n % 5 == 0 )); then
+  if (( n % 4 == 0 )); then
     ( timeout $timeout ./pull.py $names >> last_output 2>&1 ) &
-    sleep 6 
+    sleep 12
     names=''
   else
     names="$names $i"
