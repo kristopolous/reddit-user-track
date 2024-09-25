@@ -1,7 +1,9 @@
 praw
 redis
 imagehash
+opencv-python
 git+https://github.com/kristopolous/py-gfycat
+hexhamming
 imgurpython
 photohash
 yt-dlp

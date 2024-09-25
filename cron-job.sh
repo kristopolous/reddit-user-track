@@ -8,6 +8,7 @@ truncate --size 0 last_output
 n=0
 names=''
 timeout=5m
+source env/bin/activate
 find data -size 0c -name \*.jpg -exec rm {} \;
 
 for i in $(ls data/ | shuf); do
@@ -15,7 +16,7 @@ for i in $(ls data/ | shuf); do
   who=$(basename -- "$i")
   if (( n % 4 == 0 )); then
     ( timeout $timeout ./pull.py $names >> last_output 2>&1 ) &
-    sleep 12
+    sleep 15
     names=''
   else
     names="$names $i"

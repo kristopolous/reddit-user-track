@@ -41,7 +41,10 @@ function vote(who, dir, el) {
   if (_ban) {
     el.style.display = 'none';
     fetch(`remove.php?path=${el.dataset.href}`);
-    return;
+    // we actually continue with our logic but go
+    // the opposite direction since we are removing
+    // a thumbnail
+    dir *= -0.5;
   }
   else if(el && el.dataset.href){
     window.open(el.dataset.href);

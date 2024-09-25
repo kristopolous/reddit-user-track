@@ -24,6 +24,8 @@ import pprint
 
 start = time.time()
 last = start
+addurl = lambda urllist, what, entry: urllist.add(f'{what} {entry.subreddit}/{entry.id}')
+
 def ts(w):
     global start, last
     now = time.time()
@@ -87,10 +89,12 @@ def lf(path, kind = 'set'):
             return set(fp.read().splitlines())
 
 fail = lf('fail.json', 'json') or {}
+subblock = lf('subblock.txt') or set()
 
 def get(url):
     request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
     return urllib.request.urlopen(request)
+
 
 def cksumcheck(path, doDelete=True, who=None):
     filename = os.path.basename(path)
@@ -211,7 +215,7 @@ for who in all:
     urllist = set()
 
     if not args.force:
-        urllist = lf("{}/urllist.txt".format(content)) or set()
+        urllist = set([x.split(' ')[0] for x in lf("{}/urllist.txt".format(content)) or set()])
 
     titlelist = lf("{}/titlelist.txt".format(content)) or set()
     entrylist = lf("{}/entrylist.txt".format(content)) or set()
@@ -281,7 +285,7 @@ for who in all:
             if len(filename) == 0:
                 
                 titlelist.add(entry.selftext)
-                urllist.add(entry.url)
+                addurl(urllist, entry.url, entry)
                 linklist = re.findall(r'http[^\s\])]*', entry.selftext)
                 if len(linklist) > 0:
 
@@ -301,7 +305,7 @@ for who in all:
                                 logging.warning("Cannot grab path {} for text {}".format(imgurl, entry.selftext))
                                 continue
 
-                            urllist.add(imgurl)
+                            addurl(urllist, imgurl, entry)
 
                             try:
                                 with open(path, 'bw') as f:
@@ -315,6 +319,10 @@ for who in all:
                 continue
 
             subred = entry.subreddit.display_name
+
+            if subred in subblock:
+                logging.debug("Not grabbing because {} is a blocked sub".format(subred))
+                continue
 
             subredUser.append([datetime.now().strftime("%Y%m%d"), subred])
 
@@ -359,13 +367,13 @@ for who in all:
 
                     if not os.path.exists(path) and not r.hget('ignore',path):
                         remote = get(imgurl)
-                        urllist.add(imgurl)
+                        addurl(urllist, imgurl, entry)
 
                         with open(path, 'bw') as f:
                             f.write(remote.read())
                         print("   \_{}".format(path))
                         
-                urllist.add(entry.url)
+                addurl(urllist, entry.url, entry)
                 continue
 
             print(" \_{}".format(path))
@@ -424,7 +432,7 @@ for who in all:
                     subprocess.run(['/usr/local/bin/yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                     print("   \_ Got it another way")
                     #    ignore[path] = "na" 
-                    urllist.add(entry.url)
+                    addurl(urllist, entry.url, entry)
                     continue
 
             try:
@@ -433,7 +441,7 @@ for who in all:
                 with open(path, 'bw') as f:
                     f.write(remote.read())
 
-                urllist.add(entry.url)
+                addurl(urllist, entry.url, entry)
 
             except Exception as ex:
                 print("   woops, can't get {} ({} -> {}): {}".format(entry.url, url_to_get, path, ex))
