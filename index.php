@@ -108,6 +108,18 @@ if($fm) {
     }
   }
 }
+function cmp($a, $b) {
+    if ($a == 0) {
+        $a = PHP_INT_MAX;
+    }
+    if ($b == 0) {
+        $b = PHP_INT_MAX;
+    }
+    if ($a == $b) {
+        return 0;
+    }
+    return ($a < $b) ? 1 : -1;
+}
 
 if(isset($userList)) {
   $toShow = explode(',',$userList);
@@ -120,7 +132,7 @@ if(isset($userList)) {
     }
     // $db[$k] = 0;
   }
-  arsort($db);
+  uasort($db, 'cmp');
   $toShow = array_keys($db);
 }
 
