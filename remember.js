@@ -28,7 +28,7 @@ function showall(who,el) {
 }
 
 function mayberemove(what) {
-  if (_ban) {
+  if (_ban && what.children.item(0).src) {
     what.style.display = 'none';
     fetch(`remove.php?path=${what.children.item(0).src}`);
     return;
@@ -38,7 +38,7 @@ function mayberemove(what) {
 
 // dir can also be amount
 function vote(who, dir, el) {
-  if (_ban) {
+  if (_ban && el.dataset.href) {
     el.style.display = 'none';
     fetch(`remove.php?path=${el.dataset.href}`);
     // we actually continue with our logic but go
@@ -69,7 +69,7 @@ function toggle (el) {
   _ban = el.classList.contains('active')
 } 
 
-window.onload = function() {
+document.addEventListener("DOMContentLoaded", function() {
   let cont = document.getElementById('content');
   let content = [];
   document.querySelectorAll(".cont").forEach( r => {
@@ -101,5 +101,5 @@ window.onload = function() {
   content.sort((b,a) => a[0] - b[0]).forEach(r => {
     cont.appendChild(r[1])
   });
-}
+})
 
