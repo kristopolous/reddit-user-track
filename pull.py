@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -OO
+#!/usr/bin/env python3 
 import praw
 import logging
 import os
@@ -39,6 +39,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--force", help="Force", action='store_true')
 parser.add_argument("-g", "--gallery", help="Get the galleries again", action='store_true')
 parser.add_argument("-v", "--video", help="Get the video again", action='store_true')
+parser.add_argument("-r", "--redgif", help="Get just the redgif again", action='store_true')
 args, unknown = parser.parse_known_args()
 
 reddit = praw.Reddit(
@@ -49,6 +50,8 @@ reddit = praw.Reddit(
 )
 ts('con:reddit')
 
+gfy_list = []
+
 try:
     from gfycat.client import GfycatClient
     gfycat = GfycatClient(
@@ -56,7 +59,7 @@ try:
         mysecrets.gfycat['secret'],
         default_endpoint='api.redgifs.com'
     )
-    gfy_list = ['gfycat.com', 'i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
+    gfy_list = ['gfycat.com']
 
 except Exception as a:
     gfycat = None
@@ -76,6 +79,14 @@ except:
 
 ts('con:img')
 
+#try:
+from redgifs import API
+api = API()
+redgif = api.login()
+red_list = ['i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
+#except:
+#    redgif = None
+#    logging.warning("REDGIF failed")
 
 def lf(path, kind = 'set'):
     if os.path.exists(path):
@@ -259,7 +270,6 @@ for who in all:
             logging.debug("Couldn't get path for {}".format(entry.url))
             continue
 
-
         path = "{}/{}".format(content, filename)
 
         """
@@ -277,11 +287,11 @@ for who in all:
         if r.hget('ignore', path):
             continue
 
-        if parts.netloc in gfy_list:
+        if parts.netloc in (gfy_list + red_list):
             if '.' not in path: 
                 path += '.mp4'
 
-        if not entry.url in urllist: #or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
+        if not entry.url in urllist or (args.redgif and 'redgif' in entry.url): #or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
             if len(filename) == 0:
                 
                 titlelist.add(entry.selftext)
@@ -412,24 +422,51 @@ for who in all:
 
                 print("   \_{}".format(url_to_get))
 
-            elif parts.netloc in gfy_list:
+            elif parts.netloc in red_list:
                 url_path = parts.path.split('/')
                 obj = None
                 try:
                     to_get = url_path[-1]
                     to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
                     to_get = re.sub('.jpg','',to_get)
-                    raise Exception("api broken")
-                    obj = gfycat.query_gfy(to_get)
-                    url_to_get = obj.get('gfyItem').get('mp4Url')
+                    url_to_get = entry.url
+                    api.download(url_to_get, path)
 
-                    if url_to_get is None:
-                        url_to_get = obj.get('gfyItem').get('content_urls').get('large').get('url')
+                    #if url_to_get is None:
+                    #    url_to_get = obj.get('gfyItem').get('content_urls').get('large').get('url')
                     print("   \_{}".format(url_to_get))
-
+                    addurl(urllist, entry.url, entry)
+                    continue
+                
                 except Exception as ex:
                     print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    subprocess.run(['/usr/local/bin/yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                    print("   \_ Got it another way")
+                    #    ignore[path] = "na" 
+                    addurl(urllist, entry.url, entry)
+                    continue
+
+            elif parts.netloc in gfy_list:
+                url_path = parts.path.split('/')
+                obj = None
+                try:
+                    #print(url_path)
+                    to_get = url_path[-1]
+                    to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
+                    to_get = re.sub('.jpg','',to_get)
+                    obj = gfycat.query_gfy(to_get)
+                    url_to_get = obj.get('gfyItem').get('mp4Url')
+                    api.download(url_to_get, path)
+
+                    #if url_to_get is None:
+                    #    url_to_get = obj.get('gfyItem').get('content_urls').get('large').get('url')
+                    print("   \_{}".format(url_to_get))
+
+                    continue
+                
+                except Exception as ex:
+                    print("   \_ Unable to get {} : {}".format(entry.url, ex))
+                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                     print("   \_ Got it another way")
                     #    ignore[path] = "na" 
                     addurl(urllist, entry.url, entry)

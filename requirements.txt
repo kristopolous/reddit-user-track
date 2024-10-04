@@ -2,6 +2,7 @@ praw
 redis
 imagehash
 opencv-python
+redgifs
 git+https://github.com/kristopolous/py-gfycat
 hexhamming
 imgurpython
