@@ -15,7 +15,7 @@ for i in $(ls data/ | shuf); do
   (( n++ ))
   who=$(basename -- "$i")
   if (( n % 4 == 0 )); then
-    ( timeout $timeout ./pull.py $names >> last_output 2>&1 ) &
+    ( timeout $timeout python3 /pull.py $names >> last_output 2>&1 ) &
     sleep 15
     names=''
   else
@@ -24,7 +24,7 @@ for i in $(ls data/ | shuf); do
 done
 
 if [[ -n "$names" ]]; then
-  timeout $timeout ./pull.py $names >> last_output 2>&1
+  timeout $timeout python3 /pull.py $names >> last_output 2>&1
 fi
 
 ./facer.py &

@@ -50,23 +50,7 @@ reddit = praw.Reddit(
 )
 ts('con:reddit')
 
-gfy_list = []
-
-try:
-    from gfycat.client import GfycatClient
-    gfycat = GfycatClient(
-        mysecrets.gfycat['id'],
-        mysecrets.gfycat['secret'],
-        default_endpoint='api.redgifs.com'
-    )
-    gfy_list = ['gfycat.com']
-
-except Exception as a:
-    gfycat = None
-    gfy_list = []
-    logging.warning("GFYCAT failed to load {}".format(a))
-
-ts('con:gfy')
+gfy_list = ['gfycat.com', 'i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
 
 try:
     imgur = ImgurClient(
@@ -78,15 +62,6 @@ except:
     logging.warning("IMGUR failed to load")
 
 ts('con:img')
-
-#try:
-from redgifs import API
-api = API()
-redgif = api.login()
-red_list = ['i.redgifs.com', 'redgifs.com', 'www.redgifs.com']
-#except:
-#    redgif = None
-#    logging.warning("REDGIF failed")
 
 def lf(path, kind = 'set'):
     if os.path.exists(path):
@@ -287,7 +262,7 @@ for who in all:
         if r.hget('ignore', path):
             continue
 
-        if parts.netloc in (gfy_list + red_list):
+        if parts.netloc in gfy_list:
             if '.' not in path: 
                 path += '.mp4'
 
@@ -422,55 +397,17 @@ for who in all:
 
                 print("   \_{}".format(url_to_get))
 
-            elif parts.netloc in red_list:
-                url_path = parts.path.split('/')
-                obj = None
-                try:
-                    to_get = url_path[-1]
-                    to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
-                    to_get = re.sub('.jpg','',to_get)
-                    url_to_get = entry.url
-                    api.download(url_to_get, path)
-
-                    #if url_to_get is None:
-                    #    url_to_get = obj.get('gfyItem').get('content_urls').get('large').get('url')
-                    print("   \_{}".format(url_to_get))
-                    addurl(urllist, entry.url, entry)
-                    continue
-                
-                except Exception as ex:
-                    print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
-                    print("   \_ Got it another way")
-                    #    ignore[path] = "na" 
-                    addurl(urllist, entry.url, entry)
-                    continue
-
             elif parts.netloc in gfy_list:
                 url_path = parts.path.split('/')
                 obj = None
-                try:
-                    #print(url_path)
-                    to_get = url_path[-1]
-                    to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
-                    to_get = re.sub('.jpg','',to_get)
-                    obj = gfycat.query_gfy(to_get)
-                    url_to_get = obj.get('gfyItem').get('mp4Url')
-                    api.download(url_to_get, path)
-
-                    #if url_to_get is None:
-                    #    url_to_get = obj.get('gfyItem').get('content_urls').get('large').get('url')
-                    print("   \_{}".format(url_to_get))
-
-                    continue
-                
-                except Exception as ex:
-                    print("   \_ Unable to get {} : {}".format(entry.url, ex))
-                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
-                    print("   \_ Got it another way")
-                    #    ignore[path] = "na" 
-                    addurl(urllist, entry.url, entry)
-                    continue
+                to_get = url_path[-1]
+                to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
+                to_get = re.sub('.jpg','',to_get)
+                url_to_get = entry.url
+                print("   \_{}".format(url_to_get))
+                subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                addurl(urllist, entry.url, entry)
+                continue
 
             try:
                 request = urllib.request.Request(url_to_get, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
