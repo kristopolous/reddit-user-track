@@ -403,9 +403,10 @@ for who in all:
                 to_get = url_path[-1]
                 to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
                 to_get = re.sub('.jpg','',to_get)
-                url_to_get = entry.url
-                print("   \_{}".format(url_to_get))
-                subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+                if not os.path.exists(path):
+                    url_to_get = entry.url
+                    print("   \_{}".format(url_to_get))
+                    subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                 addurl(urllist, entry.url, entry)
                 continue
 
