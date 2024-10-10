@@ -233,6 +233,7 @@ for who in all:
 
     ts('presub')
     isNew = False
+    url_seen = set()
     try:
         submissions = list(submissions)
     except:
@@ -266,7 +267,9 @@ for who in all:
             if '.' not in path: 
                 path += '.mp4'
 
-        if not entry.url in urllist or (args.redgif and 'redgif' in entry.url): #or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
+        if not entry.url in urllist or (args.redgif and 'redgif' in entry.url) or (args.gallery and 'gallery' in entry.url) or (args.video and 'v.redd' in entry.url):  
+            continue if entry.url in url_seen else url_seen.add(entry.url)
+
             if len(filename) == 0:
                 
                 titlelist.add(entry.selftext)
