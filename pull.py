@@ -131,7 +131,7 @@ def cksumcheck(path, doDelete=True, who=None):
     return ihash
 
 if len(unknown) > 0:
-    all = unknown
+    all = list([m.lower() for m in unknown])
 
 else: 
     with open('userlist.txt') as fp:
