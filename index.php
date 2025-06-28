@@ -127,12 +127,13 @@ if(isset($userList)) {
   $toShow = glob("data/*");
   $nameList = array_map(function($r) { return substr($r, 5); }, $toShow);
   foreach($nameList as $k) {
-    if(!array_key_exists($k, $db)) {
-      $db[$k] = 0;
-    }
+      if(!array_key_exists($k, $db)) {
+        $db[$k] = 0;
+      }
     // $db[$k] = 0;
   }
-  uasort($db, 'cmp');
+  arsort($db);
+  //uasort($db, 'cmp');
   $toShow = array_keys($db);
 }
 
@@ -145,6 +146,7 @@ if ($qstr) {
   }
   foreach($toShow as $user) {
     $match = true;
+    // , is an &
     foreach($regParts as $sub) {
       $match &= preg_match($sub, $user);
     }
@@ -163,7 +165,6 @@ if ($qstr) {
           $matchMap[$user] = [];
         }
         foreach(array_slice($matches[0], 0, 3) as $line) {
-
           $matchMap[$user][] = $line;
         }
       }

@@ -9,7 +9,7 @@ import os
 from imagehash import ImageMultiHash
 from pprint import pprint
 from hexhamming import hamming_distance_string
-r = redis.Redis(host='localhost', port=6379, db=0,charset="utf-8", decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 hdict={}
 pdict={}

@@ -5,9 +5,15 @@ function db($key = false, $value = false) {
   global $_db;
   $db = [];
   if(file_exists($_db)) {
-    $db = json_decode(file_get_contents($_db), true);
+    $raw = file_get_contents($_db);
+    $db = json_decode($raw, true);
     if(!$db) {
-      $db = [];
+      if(strlen($raw) < 10) {
+        $db = [];
+      } else {
+        // we want to avoid corrupting things
+        return;
+      } 
     }
   }
 
