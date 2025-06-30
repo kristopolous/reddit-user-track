@@ -2,6 +2,7 @@
 
 function db($key = false, $value = false) {
   $redis = new Redis();
+  $redis->connect('127.0.0.1', 6379);
   $obj = 'rating';
   $db = $redis->hgetall($obj) ?? [];
 
