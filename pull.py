@@ -1,5 +1,6 @@
 #!/usr/bin/env python3 
 import praw
+import random
 import logging
 import os
 import urllib
@@ -140,7 +141,10 @@ else:
 if not os.path.isdir('data'):
     os.mkdir('data')
 
+all = list(set([who.lower() for who in all]))
+random.shuffle(all)
 for who in all:
+    who = who.lower()
     content = "data/{}".format(who)
 
     # if we've made the user path
@@ -356,13 +360,16 @@ for who in all:
                     urlparts = urlparse(imgurl)
                     path = "{}/{}".format(content, urlparts.path[1:])
 
-                    if not os.path.exists(path) and not r.hget('ignore',path):
-                        remote = get(imgurl)
-                        addurl(urllist, imgurl, entry)
+                    try:
+                        if not os.path.exists(path) and not r.hget('ignore',path):
+                            remote = get(imgurl)
+                            addurl(urllist, imgurl, entry)
 
-                        with open(path, 'bw') as f:
-                            f.write(remote.read())
-                        print("   \_{}".format(path))
+                            with open(path, 'bw') as f:
+                                f.write(remote.read())
+                            print("   \_{}".format(path))
+                    except Exception as ex:
+                        logging.warning("Unable to get user: {}".format(ex))
                         
                 addurl(urllist, entry.url, entry)
                 continue
