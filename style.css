@@ -39,10 +39,9 @@ button,input {
   color: #aac;
 }
 .matches p{
-  margin: 0.5rem 1rem;
+  margin: 0;
   font-family: sans;
-
-  font-size: 20px;
+  font-size: .8rem;
   color: #aaa;
 }
 a.profile-link { font-size:16px }
