@@ -33,7 +33,7 @@ def ts(w):
     #print("{:10.4f} {:10.4f} {}".format(now - last, now - start, w))
     last = now
 
-r = redis.Redis(host='localhost', port=6379, db=0,charset="utf-8", decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 logging.basicConfig(level=os.getenv('LOGLEVEL') or 'WARNING')
 parser = argparse.ArgumentParser()

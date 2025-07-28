@@ -7,7 +7,7 @@ import imagehash
 import os
 from imagehash import ImageMultiHash
 from pprint import pprint
-r = redis.Redis(host='lappy.local', port=6379, db=0,charset="utf-8", decode_responses=True)
+r = redis.Redis(host='lappy.local', port=6379, db=0, decode_responses=True)
 
 for line in sys.stdin:
   path1 = line.strip()

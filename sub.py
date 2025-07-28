@@ -6,10 +6,10 @@ import json
 import sys
 import pdb
 reddit = praw.Reddit(
-    client_id=mysecrets.reddit['block']['id'], 
-    client_secret=mysecrets.reddit['block']['secret'], 
-    password=mysecrets.reddit['block']['password'], user_agent='test', 
-    username=mysecrets.reddit['block']['username']
+    client_id=mysecrets.reddit['pull']['id'], 
+    client_secret=mysecrets.reddit['pull']['secret'], 
+    password=mysecrets.reddit['pull']['password'], user_agent='test', 
+    username=mysecrets.reddit['pull']['username']
 )
 
 def lf(path, kind = 'set'):
