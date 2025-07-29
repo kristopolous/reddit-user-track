@@ -21,7 +21,6 @@ from PIL import Image
 from urllib.parse import urlparse
 from imgurpython import ImgurClient
 from datetime import datetime
-import pprint
 
 start = time.time()
 last = start
@@ -75,7 +74,7 @@ def lf(path, kind = 'set'):
 
             return set(fp.read().splitlines())
 
-fail = lf('fail.json', 'json') or {}
+fail = r.hgetall('fail') or {}
 subblock = lf('subblock.txt') or set()
 
 def get(url):
@@ -222,11 +221,13 @@ for who in all:
     try:
         if who in fail:
             del(fail[who])
+            r.hdel('fail', who)
 
     except:
         if not who in fail:
             fail[who] = 0
         fail[who] += 1
+        r.hset('fail', who, fail[who])
 
         print("Woops, no submissions {} ({})".format(who, fail[who]))
 
@@ -240,7 +241,14 @@ for who in all:
     url_seen = set()
     try:
         submissions = list(submissions)
-    except:
+    except Exception as ex:
+        if ex.response.status_code in [403,404]: 
+            print("   \_",ex.response.status_code)
+            if not who in fail:
+                fail[who] = 0
+            fail[who] += 1
+            r.hset('fail', who, fail[who])
+
         continue
 
     #print(len(submissions))
@@ -482,10 +490,5 @@ for who in all:
 
     with open("{}/titlelist.txt".format(content), 'w') as fp:
         fp.write('\n'.join(list(titlelist)))
-
-
-for i in ['fail']:
-    with open(i + '.json', 'w') as f:
-        json.dump(globals().get(i), f)
 
 ts('done')
