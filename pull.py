@@ -74,7 +74,7 @@ def lf(path, kind = 'set'):
 
             return set(fp.read().splitlines())
 
-fail = r.hgetall('fail') or {}
+fail = {k:int(v) for k,v in (r.hgetall('fail') or {}).items()}
 subblock = lf('subblock.txt') or set()
 
 def get(url):
@@ -190,7 +190,7 @@ for who in all:
                 os.unlink(path_tn)
                 os.unlink(path)
 
-    if fail.get(who) and fail.get(who) > 3:
+    if fail.get(who) and fail.get(who) > 1:
         print(" -- {}".format(who))
         continue
 
@@ -246,7 +246,7 @@ for who in all:
             print("   \_",ex.response.status_code)
             if not who in fail:
                 fail[who] = 0
-            fail[who] += 1
+            fail[who] += 2
             r.hset('fail', who, fail[who])
 
         continue
