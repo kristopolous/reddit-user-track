@@ -1,6 +1,8 @@
 <!doctype html5><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel=stylesheet href=style.css?4 /><script src=remember.js?1></script><div id=links>
 <?php
 
+require __DIR__ . '/vendor/autoload.php';
+
 include('lib.php');
 include('db.php');
 $db = db();
@@ -91,7 +93,11 @@ $res = [];
 $filter = false;
 
 if($use_fail) {
-  $filter = array_keys(json_decode(file_get_contents('fail.json'), true));
+  require 'Predis/Autoloader.php';
+  Predis\Autoloader::register();
+  $client = new Predis\Client();
+
+  $filter = $client->hgetkeys('fail');
 }
 
 if($fm) {
