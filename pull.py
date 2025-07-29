@@ -191,14 +191,14 @@ for who in all:
                 os.unlink(path)
 
     if fail.get(who) and fail.get(who) > 1:
-        print(" -- {}".format(who))
+        print("  -{}".format(who))
         continue
 
     if not os.path.exists(content):
-        print(" /{} (Making dir)".format(who))
+        print(" / {} (Making dir)".format(who))
         os.mkdir(content)
     else:
-        print(" /{}".format(who))
+        print(" / {}".format(who))
 
 
     urllist = set()

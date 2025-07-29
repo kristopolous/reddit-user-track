@@ -93,11 +93,9 @@ $res = [];
 $filter = false;
 
 if($use_fail) {
-  require 'Predis/Autoloader.php';
-  Predis\Autoloader::register();
-  $client = new Predis\Client();
-
-  $filter = $client->hgetkeys('fail');
+  $redis = new Redis();
+  $redis->connect('127.0.0.1', 6379);
+  $filter = $redis->hkeys('fail');
 }
 
 if($fm) {
