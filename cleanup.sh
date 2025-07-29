@@ -5,9 +5,13 @@ gif2mp4() {
   count=0
   for i in data/*/*.gif; do
     new="${i/gif/mp4}"
-    ffmpeg -y -loglevel -3 -i "${i}" -crf 27 "${new}"
-    [[ -s "${i/gif/mp4}" ]] && rm -- "${i}"
-    echo $count $total "$i -> $new"
+    if [[ -s "${new}" ]]; then 
+      echo "!!! WTF!!! $new exists!"
+    else
+      ffmpeg -y -loglevel -3 -i "${i}" -crf 27 "${new}"
+      [[ -s "${i/gif/mp4}" ]] && rm -- "${i}"
+      echo $count $total "$i -> $new"
+    fi
     (( count++ ))
   done
 }

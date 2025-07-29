@@ -11,9 +11,13 @@ timeout=5m
 source env/bin/activate
 find data -size 0c -name \*.jpg -exec rm {} \;
 
-for i in ${subs[@]}; do
-  ./sub.py $i
-done
+getsubs() {
+  for i in ${subs[@]}; do
+    ./sub.py $i
+  done
+}
+getsubs
+
 for i in $(ls data/ | shuf); do
   (( n++ ))
   who=$(basename -- "$i")

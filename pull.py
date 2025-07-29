@@ -242,6 +242,9 @@ for who in all:
         submissions = list(submissions)
     except:
         continue
+
+    #print(len(submissions))
+
     for entry in submissions:
 
         try:
