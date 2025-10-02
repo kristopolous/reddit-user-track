@@ -13,6 +13,11 @@ div.inner.all {height:90vh;overflow-y:auto }
 .all video, .all img { width: 33.3%; }
 span { text-indent: .5rem; font-family:sans;font-size: 20px; color: #aaa;background:#222;padding:0.5rem; display: block }
 .show img, .show video {visibility: visible }
+img, video {
+  box-shadow: 0 0 3px 3px inset #444;
+  min-width: 40px;
+  min-height: 40px;
+}
 #paging {
   color: white;
   font-size: 24px;
