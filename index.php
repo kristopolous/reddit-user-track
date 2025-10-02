@@ -13,6 +13,7 @@ $last = $_GET['last'] ?? ($newest ? 24*60*365*10 : '24');
 $format = $_GET['format'] ?? '*';
 $max = $_GET['max'] ?? PHP_INT_MAX;
 $min = $_GET['min'] ?? 0;
+$onlyVideo = $_GET['video'] ?? null;
 $page = $_GET['page'] ?? 0;
 $qstr = $_GET['q'] ?? null;
 $fm = $_GET['fm'] ?? null;
@@ -215,6 +216,14 @@ foreach($toShow as $user_short) {
 
   $row = [];
   $count = 0;
+  if($onlyVideo) {
+    $list = glob("$user/*.{webm,gif,mp4,gifv,mkv,ogv}", GLOB_BRACE);
+    if(count($list) == 0) {
+      continue;
+    }
+  }
+
+
   $list = glob("$user/*.$format");
   usort($list, function($a,$b) { return filemtime($b) - filemtime($a);});
   if ($min > count($list) || count($list) > $max ) {
@@ -271,7 +280,9 @@ foreach($toShow as $user_short) {
       if(is_video($orig)) {
         echo "<video title='$dt' poster=\"tnail.php?url=$f\" class=video preload=none loop muted='' controls><source src='$f'></video>";
       } else {
-        echo "\n <img title='$dt' src='tnail.php?url=$f'>";
+  if(!$onlyVideo) {        
+    echo "\n <img title='$dt' src='tnail.php?url=$f'>";
+  }
       }
     }
   }
