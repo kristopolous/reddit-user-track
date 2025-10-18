@@ -11,19 +11,13 @@ timeout=5m
 source env/bin/activate
 find data -size 0c -name \*.jpg -exec rm {} \;
 
-getsubs() {
-  for i in ${subs[@]}; do
-    ./sub.py $i
-  done
-}
-getsubs
 
 for i in $(ls data/ | shuf); do
   (( n++ ))
   who=$(basename -- "$i")
-  if (( n % 4 == 0 )); then
+  if (( n % 8 == 0 )); then
     ( timeout $timeout python3 ./pull.py $names >> last_output 2>&1 ) &
-    sleep 15
+    sleep 4
     names=''
   else
     names="$names $i"
