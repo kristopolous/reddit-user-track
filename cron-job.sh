@@ -17,7 +17,7 @@ for i in $(ls data/ | shuf); do
   who=$(basename -- "$i")
   if (( n % 8 == 0 )); then
     ( timeout $timeout python3 ./pull.py $names >> last_output 2>&1 ) &
-    sleep 4
+    sleep 1
     names=''
   else
     names="$names $i"

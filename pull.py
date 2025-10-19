@@ -224,15 +224,13 @@ for who in all:
         mru = float(mru)
         delta = time.time() - mru
         days = delta / (60 * 60 * 24)
-        if days > 21:
-            # we want between a 3-73% chance to pull
+        if days > 7:
+            # we want between a >0-<100 chance to pull
             # based on the mru
-            days_r = 63 - min(62, (days - 21)/3)
+            days_r = 63 - min(62, (days - 7)/3)
             if (random.random() * 100) > days_r:
                 logging.warning(f"Skipping {who} - last seen {int(days)} days ago")
                 continue
-        else:
-            logging.warning(f"!!! Pulling {who} - last seen {int(days)} days ago")
     else:
         logging.warning(f"No MRU for {who}")
 
