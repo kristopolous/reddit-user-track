@@ -88,7 +88,6 @@ def get(url):
     request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
     return urllib.request.urlopen(request)
 
-
 def cksumcheck(path, doDelete=True, who=None):
     filename = os.path.basename(path)
     ihash = r.hget('cksum_rev', "{}/{}".format(who,filename))
@@ -231,12 +230,14 @@ for who in all:
             if (random.random() * 100) > days_r:
                 logging.warning(f"Skipping {who} - last seen {int(days)} days ago")
                 continue
+        else:
+            logging.warning(f"Pulling {who}")
     else:
         logging.warning(f"No MRU for {who}")
 
     ts('pre sub pull')
     try:
-        submissions = reddit.redditor(who).submissions.new(limit=25)
+        submissions = reddit.redditor(who).submissions.new()
     except:
         print("who is {}".format(who))
         continue
