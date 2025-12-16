@@ -223,7 +223,7 @@ for who in all:
         mru = float(mru)
         delta = time.time() - mru
         days = delta / (60 * 60 * 24)
-        if days > 7:
+        if days > 7 and len(all) > 2:
             # we want between a >0-<100 chance to pull
             # based on the mru
             days_r = 63 - min(62, (days - 7)/3)
@@ -337,6 +337,8 @@ for who in all:
                                     with open(path, 'bw') as f:
                                         f.write(remote.read())
                                         print("   \_{}".format(path))
+                                    r.hset('subs', path, subred)
+
                                 except:
                                     logging.warning("Can't open path {} for text {} to save {}".format(path, entry.selftext, imgurl))
 
@@ -400,6 +402,8 @@ for who in all:
 
                                 with open(path, 'bw') as f:
                                     f.write(remote.read())
+                                r.hset('subs', path, subred)
+
                                 print("   \_{}".format(path))
                         except Exception as ex:
                             logging.warning("Unable to get user: {}".format(ex))
@@ -463,6 +467,7 @@ for who in all:
                     remote = urllib.request.urlopen(request)
                     with open(path, 'bw') as f:
                         f.write(remote.read())
+                    r.hset('subs', path, subred)
 
                     addurl(urllist, entry.url, entry)
                     dirty['url'] = 1
