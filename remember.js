@@ -57,7 +57,7 @@ function vote(who, dir, el) {
     fetch(`vote.php?who=${who}&what=${db[who]}`);
   } 
   if(dir != 0.1 && el) {
-    el.parentNode.getElementsByTagName('b')[0].innerHTML = db[who];
+    el.parentNode.getElementsByTagName('b')[0].innerHTML = db[who].toFixed(2);
   }
 
   return db[who] || 0;
