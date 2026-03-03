@@ -9,13 +9,14 @@ if ($isMovie) {
 }
 
 $url = escapeshellarg($url);
-if (!file_exists("tn/$flatten_url")) {
-  $tn = escapeshellarg("tn/$flatten_url");
+$raw_path = realpath("tn") . "/$flatten_url";
+$tn = escapeshellarg($raw_path);
+if (!is_file($raw_path)) {
   if ($isMovie) {
     # frame grab
     shell_exec("ffmpeg -loglevel quiet -ss 1 -i $url -vframes 1 -q:v 6 $tn");
   } else {
-    shell_exec("convert $url -resize 300x $tn");
+    shell_exec("vipsthumbnail $url -s 300 -o $tn'[Q=70,strip]'");
   }
 }
 $flatten_url = preg_replace('/\+/', ' ', urlencode($flatten_url));
