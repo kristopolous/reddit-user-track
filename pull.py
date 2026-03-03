@@ -336,7 +336,7 @@ for who in all:
                                 try:
                                     with open(path, 'bw') as f:
                                         f.write(remote.read())
-                                        print("   \_{}".format(path))
+                                        print("   \\_{}".format(path))
                                     r.hset('subs', path, subred)
 
                                 except:
@@ -404,7 +404,7 @@ for who in all:
                                     f.write(remote.read())
                                 r.hset('subs', path, subred)
 
-                                print("   \_{}".format(path))
+                                print("   \\_{}".format(path))
                         except Exception as ex:
                             logging.warning("Unable to get user: {}".format(ex))
                             
@@ -412,7 +412,7 @@ for who in all:
                     dirty['url'] = 1
                     continue
 
-                print(" \_{}".format(path))
+                print(" \\_{}".format(path))
 
                 if hasattr(entry, 'is_video') and entry.is_video and entry.secure_media is not None:
                     url_to_get = entry.secure_media['reddit_video']['fallback_url']
@@ -421,7 +421,7 @@ for who in all:
                     path += '.mp4'
                     if os.path.exists(path): 
                         continue
-                    print("   \_{}".format(url_to_get))
+                    print("   \\_{}".format(url_to_get))
 
                 elif parts.netloc in ['imgur.com','i.imgur.com']:
                     noext = os.path.splitext(parts.path)[0]
@@ -436,7 +436,7 @@ for who in all:
                             url_to_get = obj.link
 
                     except:
-                        print("   \_ Unable to get {}".format(entry.url))
+                        print("   \\_ Unable to get {}".format(entry.url))
                         r.hset('ignore', path, "na")
                         r.hset('ignore', filename, "na")
                         continue
@@ -446,17 +446,17 @@ for who in all:
                         ext = os.path.splitext(url_to_get)[1]
                         path += ext
 
-                    print("   \_{}".format(url_to_get))
+                    print("   \\_{}".format(url_to_get))
 
                 elif parts.netloc in gfy_list:
                     url_path = parts.path.split('/')
                     obj = None
                     to_get = url_path[-1]
-                    to_get = re.sub('i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
+                    to_get = re.sub(r'i.redgifs.com/i/([^\.]*).*',r'www.redgifs.com/watch/\1',to_get)
                     to_get = re.sub('.jpg','',to_get)
                     if not os.path.exists(path):
                         url_to_get = entry.url
-                        print("   \_{}".format(url_to_get))
+                        print("   \\_{}".format(url_to_get))
                         subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
                     addurl(urllist, entry.url, entry)
                     dirty['url'] = 1
@@ -489,7 +489,7 @@ for who in all:
                 cksumcheck(path, who=who)
     except Exception as ex:
         if ex.response.status_code in [403,404]: 
-            print("   \_",ex.response.status_code)
+            print("   \\_",ex.response.status_code)
             if not who in fail:
                 fail[who] = 0
             fail[who] += 2
