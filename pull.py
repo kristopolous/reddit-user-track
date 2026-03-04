@@ -458,8 +458,11 @@ for who in all:
                         url_to_get = entry.url
                         print("   \\_{}".format(url_to_get))
                         subprocess.run(['yt-dlp', 'https://redgifs.com/watch/{}'.format(to_get), '-o', path], capture_output=True)
+
+                    r.hset('subs', path, subred)
                     addurl(urllist, entry.url, entry)
                     dirty['url'] = 1
+
                     continue
 
                 try:
@@ -467,8 +470,8 @@ for who in all:
                     remote = urllib.request.urlopen(request)
                     with open(path, 'bw') as f:
                         f.write(remote.read())
-                    r.hset('subs', path, subred)
 
+                    r.hset('subs', path, subred)
                     addurl(urllist, entry.url, entry)
                     dirty['url'] = 1
 

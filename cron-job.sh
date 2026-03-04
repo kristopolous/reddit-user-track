@@ -8,7 +8,7 @@ truncate --size 0 last_output
 n=0
 names=''
 timeout=5m
-source env/bin/activate
+source .direnv/python-3.13.5/bin/activate
 find data -size 0c -name \*.jpg -exec rm {} \;
 
 
