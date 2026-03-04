@@ -30,7 +30,8 @@ function showall(who,el) {
 function mayberemove(what) {
   if (_ban && what.children.item(0).src) {
     what.style.display = 'none';
-    fetch(`remove.php?path=${what.children.item(0).src}`);
+    let url = what.children.item(0).src.replace(window.location.href.split('?')[0],'');
+    fetch(`remove.php?path=${url}`);
     return;
   }
 }
@@ -41,10 +42,9 @@ function vote(who, dir, el) {
   if (_ban && el.dataset.href) {
     el.style.display = 'none';
     fetch(`remove.php?path=${el.dataset.href}`);
-    // we actually continue with our logic but go
-    // the opposite direction since we are removing
-    // a thumbnail
-    dir *= -0.5;
+    // this is handled by the remove.php - we do this
+    // to block the subreddit
+    return;
   }
   else if(el && el.dataset.href){
     window.open(el.dataset.href);
