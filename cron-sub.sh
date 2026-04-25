@@ -7,8 +7,8 @@ cd $DIR
 truncate --size 0 last_output
 n=0
 names=''
-source env/bin/activate
+#source env/bin/activate
 
 for i in ${subs[@]}; do
-./sub.py $i
+    ./sub.py $i
 done
