@@ -41,6 +41,8 @@ parser.add_argument("-g", "--gallery", help="Get the galleries again", action='s
 parser.add_argument("-v", "--video", help="Get the video again", action='store_true')
 parser.add_argument("-r", "--redgif", help="Get just the redgif again", action='store_true')
 parser.add_argument("-b", "--backoff", type=float, default=0.50, help="Delay between pulls")
+parser.add_argument("-s", "--slow", action='store_true', help="Do everyone")
+parser.add_argument("-rs", "--reallyslow", action='store_true', help="Do really everyone")
 args, unknown = parser.parse_known_args()
 
 reddit = praw.Reddit(
@@ -197,7 +199,7 @@ for who in all:
                 os.unlink(path_tn)
                 os.unlink(path)
 
-    if fail.get(who) and fail.get(who) > 1:
+    if not args.reallyslow and (fail.get(who) and fail.get(who) > 1):
         print("  -{}".format(who))
         continue
 
@@ -220,7 +222,9 @@ for who in all:
     subredUser = lf("{}/subredditlist.txt".format(content), 'json') or []
     commentMap = lf("{}/commentmap.txt".format(content), 'json') or dict()
 
-    if mru is not None:
+    if args.slow or args.reallyslow:
+        pass
+    elif mru is not None:
         mru = float(mru)
         delta = time.time() - mru
         days = delta / (60 * 60 * 24)
