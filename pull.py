@@ -40,6 +40,7 @@ parser.add_argument("-f", "--force", help="Force", action='store_true')
 parser.add_argument("-g", "--gallery", help="Get the galleries again", action='store_true')
 parser.add_argument("-v", "--video", help="Get the video again", action='store_true')
 parser.add_argument("-r", "--redgif", help="Get just the redgif again", action='store_true')
+parser.add_argument("-b", "--backoff", type=float, default=0.50, help="Delay between pulls")
 args, unknown = parser.parse_known_args()
 
 reddit = praw.Reddit(
