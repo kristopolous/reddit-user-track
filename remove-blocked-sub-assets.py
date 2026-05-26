@@ -1,6 +1,7 @@
 #!/usr/bin/env python3 
 import redis
 import os
+import time
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 for k,v in r.hgetall('rating').items():
@@ -9,9 +10,13 @@ for k,v in r.hgetall('rating').items():
 
 toremove = set()
 for k,v in r.hgetall('subblock').items():
-    if int(v) > 8:
+    if int(v) > 8 and 'penis' not in k:
         print(f"sub: {k}")
         toremove.add(k)
+
+for i in range(8):
+    print(i)
+    time.sleep(1)
 
 for k,v in r.hgetall('subs').items():
     if v in toremove:
