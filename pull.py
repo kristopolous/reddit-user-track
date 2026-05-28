@@ -240,6 +240,11 @@ for who in all:
     else:
         logging.warning(f"No MRU for {who}")
 
+    if who[:3] == 'rg:':
+        to_get = who[3:]
+        subprocess.run(['yt-dlp', 'https://redgifs.com/users/{}'.format(to_get), '-P', content], capture_output=True)
+        continue
+
     ts('pre sub pull')
     try:
         submissions = reddit.redditor(who).submissions.new()
