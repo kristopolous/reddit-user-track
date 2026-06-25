@@ -10,7 +10,7 @@ for k,v in r.hgetall('rating').items():
 
 toremove = set()
 for k,v in r.hgetall('subblock').items():
-    if int(v) > 8 and 'penis' not in k:
+    if int(v) > 8:
         print(f"sub: {k}")
         toremove.add(k)
 
