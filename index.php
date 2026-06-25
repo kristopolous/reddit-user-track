@@ -7,7 +7,7 @@ include('lib.php');
 include('db.php');
 $db = db();
 
-$use_fail = isset($_GET['fail']);
+$fail = isset($_GET['fail']);
 $newest = $_GET['newest'] ?? 0;
 $last = $_GET['last'] ?? ($newest ? 24*60*365*10 : '24');
 $format = $_GET['format'] ?? '*';
@@ -79,8 +79,10 @@ if(!$userList) {
   echo "<a ${klass}href='" . dolink(['last' => 'all']) . "'>all</a>";
 ?>
 <form>
-<input name=last type=hidden value=<?= $last ?>>
-<input name=page type=hidden value=<?= $page ?>>
+<?php foreach(['min','max','format','last','fu','fm','newest'] as $v) { 
+    if (isset($_GET[$v])) { ?>
+        <input name="<?= $v ?>" type=hidden value="<?= $$v ?>">
+<?php } } ?>
 <input name=q placeholder=query value="<?= $qstr ?>">
 <button>go</button>
 </form>
@@ -93,7 +95,7 @@ $now = time();
 $res = [];
 $filter = false;
 
-if($use_fail) {
+if($fail) {
   $redis = new Redis();
   $redis->connect('127.0.0.1', 6379);
   $filter = $redis->hkeys('fail');
