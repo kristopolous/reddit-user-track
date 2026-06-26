@@ -16,6 +16,7 @@ import photohash
 import subprocess
 import redis
 import time
+import itertools
 from glob import glob
 from PIL import Image
 from urllib.parse import urlparse
@@ -41,6 +42,7 @@ parser.add_argument("-g", "--gallery", help="Get the galleries again", action='s
 parser.add_argument("-v", "--video", help="Get the video again", action='store_true')
 parser.add_argument("-r", "--redgif", help="Get just the redgif again", action='store_true')
 parser.add_argument("-b", "--backoff", type=float, default=0.50, help="Delay between pulls")
+parser.add_argument("-q", "--query", action='store_true', help="Do an author query search")
 parser.add_argument("-s", "--slow", action='store_true', help="Do everyone")
 parser.add_argument("-rs", "--reallyslow", action='store_true', help="Do really everyone")
 args, unknown = parser.parse_known_args()
@@ -141,6 +143,7 @@ def cksumcheck(path, doDelete=True, who=None):
 
 if len(unknown) > 0:
     all = list([m.lower() for m in unknown])
+
 
 else: 
     with open('userlist.txt') as fp:
@@ -248,6 +251,9 @@ for who in all:
     ts('pre sub pull')
     try:
         submissions = reddit.redditor(who).submissions.new()
+        if args.query:
+            search_results = reddit.subreddit('all').search(f'author:{who}', sort='new')
+            submissions = itertools.chain(submissions, search_results)
     except:
         print("who is {}".format(who))
         continue
