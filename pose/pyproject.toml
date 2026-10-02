@@ -1,0 +1,26 @@
+[project]
+name = "pose-search"
+version = "0.1.0"
+description = "Find images with similar human poses (RTMPose + Qdrant)"
+requires-python = ">=3.10"
+dependencies = [
+  "rtmlib>=0.0.13",
+  "qdrant-client>=1.10",
+  "numpy",
+  "pillow",
+]
+
+[project.optional-dependencies]
+# pick exactly one; onnxruntime and onnxruntime-gpu conflict
+cpu = ["onnxruntime"]
+cuda = ["onnxruntime-gpu"]
+
+[project.scripts]
+pose-search = "pose_search.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["pose_search"]

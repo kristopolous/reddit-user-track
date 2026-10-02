@@ -5,3 +5,10 @@ secret*
 *\?*
 index.html
 *.json
+!pose/
+!pose/**
+pose/**/__pycache__/
+pose/**/*.egg-info/
+pose-index/
+pose-smoke.html
+results/
