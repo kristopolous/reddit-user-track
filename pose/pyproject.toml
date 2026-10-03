@@ -8,6 +8,7 @@ dependencies = [
   "qdrant-client>=1.10",
   "numpy",
   "pillow",
+  "huggingface_hub",
 ]
 
 [project.optional-dependencies]

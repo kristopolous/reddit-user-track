@@ -51,12 +51,14 @@ def contact_sheet(matches, out_path, cell=256, cols=5):
   for i, m in enumerate(matches):
     x, y = (i % cols) * cell, (i // cols) * (cell + label_h)
     try:
-      im = open_with_pose(m.payload["image_path"], pose_from_payload(m.payload))
+      pose = pose_from_payload(m.payload) if "keypoints" in m.payload else None
+      im = open_with_pose(m.payload["image_path"], pose)
       im.thumbnail((cell, cell))
       sheet.paste(im, (x + (cell - im.width) // 2, y + (cell - im.height) // 2))
     except Exception as ex:
       d.text((x + 4, y + 4), f"unreadable: {ex}"[:40], fill=(255, 80, 80))
-    d.text((x + 4, y + cell + 2), f"{i + 1}. {m.score:.3f} {m.payload['pose_type']}", fill=(255, 255, 255))
+    d.text((x + 4, y + cell + 2), f"{i + 1}. {m.score:.3f} {m.payload.get('pose_type', 'image')}",
+           fill=(255, 255, 255))
     d.text((x + 4, y + cell + 17), _tail(m.payload["image_path"], 40), fill=(170, 170, 170))
 
   sheet.save(out_path, quality=90)
@@ -95,23 +97,28 @@ PAGE = """<!doctype html>
 
 
 def _svg(payload, base_dir):
-  """The image, zoomed to the matched person, with the skeleton drawn over it."""
-  pose = pose_from_payload(payload)
+  """The image, zoomed to the matched person, with the skeleton drawn over it.
+  Image-search payloads have no person: those show the whole frame."""
   w, h = payload["width"], payload["height"]
+  src = html.escape(quote(os.path.relpath(payload["image_path"], base_dir)))
+  full = f"0 0 {w} {h}"
+  if "keypoints" not in payload:
+    return (f'<svg class=cell viewBox="{full}" data-crop="{full}" data-full="{full}">'
+            f'<image href="{src}" width="{w}" height="{h}"/></svg>')
+
+  pose = pose_from_payload(payload)
   x1, y1, x2, y2 = pose.bounding_box
   side = max(x2 - x1, y2 - y1) * 1.15
   cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
   crop = f"{cx - side / 2:.0f} {cy - side / 2:.0f} {side:.0f} {side:.0f}"
   sw = side / 90
-
-  src = html.escape(quote(os.path.relpath(payload["image_path"], base_dir)))
   parts = [f'<image href="{src}" width="{w}" height="{h}"/><g class=skel>',
            f'<rect x="{x1:.0f}" y="{y1:.0f}" width="{x2 - x1:.0f}" height="{y2 - y1:.0f}" '
            f'fill="none" stroke="#ff0" stroke-width="{sw / 2:.1f}" opacity=".5"/>']
   for ax, ay, bx, by, (r, g, b) in skeleton_lines(pose):
     parts.append(f'<line x1="{ax:.0f}" y1="{ay:.0f}" x2="{bx:.0f}" y2="{by:.0f}" '
                  f'stroke="rgb({r},{g},{b})" stroke-width="{sw:.1f}" stroke-linecap="round"/>')
-  return (f'<svg class=cell viewBox="{crop}" data-crop="{crop}" data-full="0 0 {w} {h}">'
+  return (f'<svg class=cell viewBox="{crop}" data-crop="{crop}" data-full="{full}">'
           f'{"".join(parts)}</g></svg>')
 
 
@@ -121,19 +128,27 @@ def _cell(payload, caption, base_dir, cls=""):
           f'<div class=cap>{caption}</div></div>')
 
 
+def _describe(pl):
+  if "keypoints" not in pl:
+    return "whole image"
+  return (f"{pl['pose_type']} · {pl['n_bones']} bones · conf {pl['visible_conf']:.2f}"
+          f"{'' if pl['detected'] else ' · no box'}")
+
+
 def smoke_page(rows, out_path, summary, size=240):
-  """rows: [(query_payload, [Match, ...]), ...]"""
+  """rows: [(route, query_payload, [Match, ...]), ...]"""
   base = os.path.dirname(os.path.abspath(out_path))
   out = []
-  for query, matches in rows:
-    cells = [_cell(query, f"<b>query</b> {query['pose_type']} · {query['n_bones']} bones · "
-                          f"{html.escape(_tail(query['image_path'], 60))}", base, "query"),
+  for route, query, matches in rows:
+    cells = [_cell(query, f"<b>{route}</b> · {html.escape(_describe(query))}", base, "query"),
              '<div class=arrow>→</div>']
     for m in matches:
       pl = m.payload
-      cells.append(_cell(pl, f"<b>{m.score:.2f}</b> {pl['pose_type']} · "
+      cells.append(_cell(pl, f"<b>{m.score:.2f}</b> {html.escape(_describe(pl))} · "
                              f"{html.escape(_tail(pl['image_path'], 60))}", base))
-    out.append(f'<div class=row>{"".join(cells)}</div>')
+    if not matches:
+      cells.append('<div class=cap>no matches</div>')
+    out.append(f'<div class="row route-{route.split()[0]}">{"".join(cells)}</div>')
 
   with open(out_path, "w") as fp:
     fp.write(PAGE.format(s=size, summary=html.escape(summary), rows="\n".join(out)))

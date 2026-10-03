@@ -25,6 +25,7 @@ class PersonPose:
   confidence: np.ndarray      # (17,) per-joint score
   bounding_box: tuple         # (x1, y1, x2, y2) pixel coords
   person_confidence: float
+  detected: bool = True       # False: no person box, pose run on the whole frame
 
 
 def load_image(path):
@@ -36,16 +37,18 @@ def load_image(path):
   return np.ascontiguousarray(np.asarray(im)[:, :, ::-1]), scale
 
 
+PROVIDERS = {
+  "cuda": "CUDAExecutionProvider",
+  "rocm": "ROCMExecutionProvider",
+  "mps": "CoreMLExecutionProvider",
+  "cpu": "CPUExecutionProvider",
+}
+
+
 def pick_device():
   import onnxruntime
-  providers = onnxruntime.get_available_providers()
-  for provider, device in [
-      ("CUDAExecutionProvider", "cuda"),
-      ("ROCMExecutionProvider", "rocm"),
-      ("CoreMLExecutionProvider", "mps")]:
-    if provider in providers:
-      return device
-  return "cpu"
+  available = onnxruntime.get_available_providers()
+  return next((d for d, p in PROVIDERS.items() if p in available), "cpu")
 
 
 class RTMPoseEstimator:
@@ -65,10 +68,14 @@ class RTMPoseEstimator:
   def extract(self, image, scale=1.0):
     """image: BGR array (from load_image). scale: as returned by load_image."""
     boxes = self.det_model(image)
-    # rtmlib's pose model runs on the whole frame when handed no boxes,
-    # which would invent a person for every empty picture
-    if len(boxes) == 0:
-      return []
+    detected = len(boxes) > 0
+    if not detected:
+      # The detector misses most close-ups (a torso, a midsection), but the
+      # pose model often still finds shoulders/hips/arms in them. On an empty
+      # picture this invents a person with low scores; the search-time
+      # quality check (retrieve.route) is what keeps those out.
+      h, w = image.shape[:2]
+      boxes = [[0, 0, w, h]]
 
     keypoints, scores = self.pose_model(image, bboxes=boxes)
     return [
@@ -78,6 +85,7 @@ class RTMPoseEstimator:
         bounding_box=tuple(float(v) / scale for v in box),
         # the detector doesn't surface its score, so use the joints'
         person_confidence=float(np.mean(sc)),
+        detected=detected,
       )
       for kp, sc, box in zip(keypoints, scores, boxes)
     ]

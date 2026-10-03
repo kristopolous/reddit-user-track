@@ -110,6 +110,14 @@ def encode(pose, threshold=KPT_THRESHOLD):
   return vec, n
 
 
+def visible_confidence(pose, threshold=KPT_THRESHOLD):
+  """Mean score of the joints claimed visible: how sure the model is about
+  what it says it sees. Unlike the all-joint mean, a crop isn't penalized
+  for what's out of frame."""
+  sc = pose.confidence[pose.confidence >= threshold]
+  return float(sc.mean()) if len(sc) else 0.0
+
+
 def visible_bones(vec):
   return [
     f"{a}-{b}" for i, (a, b) in enumerate(BONES)
