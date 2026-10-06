@@ -9,22 +9,19 @@ A query searches by pose when its skeleton is trustworthy. Otherwise it searches
 
 ## Install
 
-Pick one onnxruntime:
-
-    pip install -e './pose[cuda]'   # nvidia
-    pip install -e './pose[cpu]'    # anything else
+Nothing to do. Run `./pose-search` from the repo root. The first run sets up `pose/.venv`, using CUDA if `nvidia-smi` exists and CPU otherwise; set `POSE_EXTRA=cpu|cuda` to force one. To reinstall, delete `pose/.venv`.
 
 The device is detected automatically (cuda, then rocm, then coreml, falling back to cpu); `--device` overrides it. The models download on first run: about 140MB into `~/.cache/rtmlib`, plus about 90MB of DINOv2 into `~/.cache/huggingface`.
 
 ## Use
 
-    pose-search index data/ --limit 2000 --shuffle   # try a random sample first
-    pose-search index data/                          # the rest; resumable, ctrl-c is safe
-    pose-search smoke                                # -> pose-smoke.html
-    pose-search smoke --route both --only somefolder/  # pose vs image search, side by side
-    pose-search search some/image.jpg                # -> results/query.jpg, results/results.jpg
-    pose-search show some/image.jpg                  # skeleton overlay + the pose vector
-    pose-search stats
+    ./pose-search index data/ --limit 2000 --shuffle   # try a random sample first
+    ./pose-search index data/                          # the rest; resumable, ctrl-c is safe
+    ./pose-search smoke                                # -> pose-smoke.html
+    ./pose-search smoke --route both --only somefolder/  # pose vs image search, side by side
+    ./pose-search search some/image.jpg                # -> results/query.jpg, results/results.jpg
+    ./pose-search show some/image.jpg                  # skeleton overlay + the pose vector
+    ./pose-search stats
 
 The index lives in `./pose-index`, or wherever `--index-dir` / `$POSE_INDEX` points. Qdrant is embedded by default. For the full corpus, run a server and pass `--qdrant-url http://localhost:6333`, because embedded mode loads every point into RAM when it starts.
 

@@ -12,3 +12,4 @@ pose/**/*.egg-info/
 pose-index/
 pose-smoke.html
 results/
+pose/.venv/
