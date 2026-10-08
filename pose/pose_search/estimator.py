@@ -8,6 +8,13 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image, ImageOps
 
+try:
+  # lets PIL open HEIC/HEIF, which is what phones save photos as
+  from pillow_heif import register_heif_opener
+  register_heif_opener()
+except ImportError:
+  pass
+
 # COCO-17 ordering, which is what RTMPose (body7) emits
 KEYPOINTS = [
   "nose", "l_eye", "r_eye", "l_ear", "r_ear",

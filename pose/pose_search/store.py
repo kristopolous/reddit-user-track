@@ -107,7 +107,8 @@ class VectorStore:
 
 class Status:
   def __init__(self, index_dir):
-    self.db = sqlite3.connect(os.path.join(index_dir, "status.db"))
+    # the web UI uses it from request threads (always under its own lock)
+    self.db = sqlite3.connect(os.path.join(index_dir, "status.db"), check_same_thread=False)
     self.db.execute("""
       create table if not exists images (
         path text primary key,
@@ -136,6 +137,11 @@ class Status:
 
   def counts(self):
     return dict(self.db.execute("select status, count(*) from images group by status"))
+
+  def has(self, path):
+    return self.db.execute(
+      "select 1 from images where path = ? and status in (?, ?)", (path, PROCESSED, NO_PERSON)
+    ).fetchone() is not None
 
   def random_indexed(self, n, only=None):
     return [row[0] for row in self.db.execute(

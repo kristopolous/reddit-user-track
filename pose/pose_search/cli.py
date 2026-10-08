@@ -81,14 +81,6 @@ def _search(store, route, pose_point, image_vec, path, args):
   return retrieve.search_images(store, image_vec, limit=args.k, exclude_image=path)
 
 
-def _routes(args, best_pose):
-  if args.route == "auto":
-    return ["pose" if best_pose else "image"]
-  if args.route == "both":
-    return (["pose"] if best_pose else []) + ["image"]
-  return [args.route]
-
-
 def cmd_search(args):
   from . import retrieve
   from .estimator import load_image
@@ -147,20 +139,10 @@ def cmd_smoke(args):
   rows = []
   for path in status.random_indexed(args.n, args.only):
     image = store.get_image(path)
-    if image is None:
-      continue
-    poses = store.get(path)
-    best = retrieve.route([p.payload for p in poses], **_thresholds(args))
-    point = next((p for p in poses if p.payload is best), None)
-    if point is None and args.route in ("pose", "both") and poses:
-      point = poses[0]  # forced/comparing: most confident, even if untrusted
-
-    for route in _routes(args, point):
-      if route == "pose" and point is None:
-        continue
-      matches = _search(store, route, point and (point.vector, point.payload), image.vector, path, args)
-      label = route if route == "image" or best is not None else "pose (untrusted)"
-      rows.append((label, point.payload if route == "pose" else image.payload, matches))
+    if image is not None:
+      poses = [(p.vector, p.payload) for p in store.get(path)]
+      rows += retrieve.query_rows(store, poses, image.vector, image.payload, exclude_image=path,
+                                  mode=args.route, k=args.k, metric=args.metric, **_thresholds(args))
 
   routes = [r.split()[0] for r, *_ in rows]
   smoke_page(rows, args.out,
@@ -169,6 +151,13 @@ def cmd_smoke(args):
              f"conf ≥{args.min_conf} · {store.count()} poses, {store.count('images')} images · "
              f"{status.counts()}")
   print(f"wrote {args.out}")
+
+
+def cmd_serve(args):
+  from .serve import App, serve
+  store, status = _store(args)
+  app = App(store, status, _estimator(args), _embedder(args), args.metric, args.min_bones, args.min_conf)
+  serve(app, args.host, args.port)
 
 
 def cmd_stats(args):
@@ -241,6 +230,13 @@ def main():
   sp.add_argument("--out", default="pose-smoke.html",
                   help="image links are relative to this file's directory")
   sp.set_defaults(fn=cmd_smoke)
+
+  sp = sub.add_parser("serve", help="web page: drop an image in, see similar poses")
+  sp.add_argument("--port", type=int, default=8765)
+  sp.add_argument("--host", default="127.0.0.1", help="0.0.0.0 to allow other machines")
+  search_args(sp)
+  estimator_args(sp)
+  sp.set_defaults(fn=cmd_serve)
 
   sp = sub.add_parser("stats")
   sp.set_defaults(fn=cmd_stats)

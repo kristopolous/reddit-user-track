@@ -9,6 +9,7 @@ dependencies = [
   "numpy",
   "pillow",
   "huggingface_hub",
+  "pillow-heif",  # phone photos (HEIC)
 ]
 
 [project.optional-dependencies]

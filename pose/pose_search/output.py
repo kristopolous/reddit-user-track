@@ -71,36 +71,34 @@ def _tail(path, n):
 
 # ---- smoke test page -------------------------------------------------------
 
-PAGE = """<!doctype html>
-<meta charset=utf-8>
-<title>pose-search smoke test</title>
-<style>
-  body {{ background:#181818; color:#ddd; font:13px system-ui, sans-serif; margin:16px }}
-  .row {{ display:flex; gap:8px; margin-bottom:18px; align-items:center; overflow-x:auto }}
-  .row > div {{ flex:none }}
-  .cell {{ width:{s}px; height:{s}px; background:#000; display:block }}
-  .query .cell {{ outline:3px solid #fc0 }}
-  .cap {{ font-size:12px; color:#aaa; width:{s}px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis }}
-  .cap b {{ color:#fff }}
-  .arrow {{ font-size:28px; color:#666 }}
-  label {{ user-select:none; margin-left:1em }}
-  body.noskel .skel {{ display:none }}
-</style>
-<p>{summary}
+STYLE = """
+  body { background:#181818; color:#ddd; font:13px system-ui, sans-serif; margin:16px }
+  .row { display:flex; gap:8px; margin-bottom:18px; align-items:center; overflow-x:auto }
+  .row > div { flex:none }
+  .cell { width:240px; height:240px; background:#000; display:block }
+  .query .cell { outline:3px solid #fc0 }
+  .cap { font-size:12px; color:#aaa; width:240px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis }
+  .cap b { color:#fff }
+  .arrow { font-size:28px; color:#666 }
+  label { user-select:none; margin-left:1em }
+  body.noskel .skel { display:none }
+"""
+
+# checkboxes for skeleton overlay and crop vs full frame
+TOGGLES = """
   <label><input type=checkbox checked
     onchange="document.body.classList.toggle('noskel', !this.checked)"> skeletons</label>
-  <label><input type=checkbox
+  <label><input type=checkbox id=fullframe
     onchange="for (const s of document.querySelectorAll('svg.cell'))
-                s.setAttribute('viewBox', s.dataset[this.checked ? 'full' : 'crop'])"> full frame</label></p>
-{rows}
+                s.setAttribute('viewBox', s.dataset[this.checked ? 'full' : 'crop'])"> full frame</label>
 """
 
 
-def _svg(payload, base_dir):
+def _svg(payload, src):
   """The image, zoomed to the matched person, with the skeleton drawn over it.
   Image-search payloads have no person: those show the whole frame."""
   w, h = payload["width"], payload["height"]
-  src = html.escape(quote(os.path.relpath(payload["image_path"], base_dir)))
+  src = html.escape(src)
   full = f"0 0 {w} {h}"
   if "keypoints" not in payload:
     return (f'<svg class=cell viewBox="{full}" data-crop="{full}" data-full="{full}">'
@@ -122,9 +120,9 @@ def _svg(payload, base_dir):
           f'{"".join(parts)}</g></svg>')
 
 
-def _cell(payload, caption, base_dir, cls=""):
+def _cell(payload, caption, src, cls=""):
   path = html.escape(payload["image_path"])
-  return (f'<div class="{cls}" title="{path}">{_svg(payload, base_dir)}'
+  return (f'<div class="{cls}" title="{path}" data-path="{path}">{_svg(payload, src)}'
           f'<div class=cap>{caption}</div></div>')
 
 
@@ -135,20 +133,30 @@ def _describe(pl):
           f"{'' if pl['detected'] else ' · no box'}")
 
 
-def smoke_page(rows, out_path, summary, size=240):
-  """rows: [(route, query_payload, [Match, ...]), ...]"""
-  base = os.path.dirname(os.path.abspath(out_path))
+def rows_html(rows, src_for):
+  """rows: [(route, query_payload, [Match, ...]), ...]; src_for: image path -> URL"""
   out = []
   for route, query, matches in rows:
-    cells = [_cell(query, f"<b>{route}</b> · {html.escape(_describe(query))}", base, "query"),
+    cells = [_cell(query, f"<b>{route}</b> · {html.escape(_describe(query))}",
+                   src_for(query["image_path"]), "query"),
              '<div class=arrow>→</div>']
     for m in matches:
       pl = m.payload
       cells.append(_cell(pl, f"<b>{m.score:.2f}</b> {html.escape(_describe(pl))} · "
-                             f"{html.escape(_tail(pl['image_path'], 60))}", base))
+                             f"{html.escape(_tail(pl['image_path'], 60))}", src_for(pl["image_path"])))
     if not matches:
       cells.append('<div class=cap>no matches</div>')
     out.append(f'<div class="row route-{route.split()[0]}">{"".join(cells)}</div>')
+  return "\n".join(out)
 
+
+def smoke_page(rows, out_path, summary):
+  base = os.path.dirname(os.path.abspath(out_path))
   with open(out_path, "w") as fp:
-    fp.write(PAGE.format(s=size, summary=html.escape(summary), rows="\n".join(out)))
+    fp.write(f"""<!doctype html>
+<meta charset=utf-8>
+<title>pose-search smoke test</title>
+<style>{STYLE}</style>
+<p>{html.escape(summary)} {TOGGLES}</p>
+{rows_html(rows, lambda path: quote(os.path.relpath(path, base)))}
+""")

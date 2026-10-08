@@ -17,6 +17,7 @@ The device is detected automatically (cuda, then rocm, then coreml, falling back
 
     ./pose-search index data/ --limit 2000 --shuffle   # try a random sample first
     ./pose-search index data/                          # the rest; resumable, ctrl-c is safe
+    ./pose-search serve                                # web page at http://127.0.0.1:8765/
     ./pose-search smoke                                # -> pose-smoke.html
     ./pose-search smoke --route both --only somefolder/  # pose vs image search, side by side
     ./pose-search search some/image.jpg                # -> results/query.jpg, results/results.jpg
@@ -26,6 +27,8 @@ The device is detected automatically (cuda, then rocm, then coreml, falling back
 The index lives in `./pose-index`, or wherever `--index-dir` / `$POSE_INDEX` points. Qdrant is embedded by default. For the full corpus, run a server and pass `--qdrant-url http://localhost:6333`, because embedded mode loads every point into RAM when it starts.
 
 `smoke` is the "does it work at all" check. It picks random indexed images and shows each one with its 4 nearest matches (`-n`, `-k`). Each row says which route the query took. Pose results are cropped to the matched person, with the skeleton drawn on top. Image results show the whole frame. It reuses the stored vectors, so it doesn't need a GPU. The image links are relative to the HTML file, so keep it next to the archive or serve both from the same place.
+
+`serve` is the interactive version. Drop any photo anywhere on the page to search by it. It doesn't need to be in the index, and phone photos (HEIC) work. You can also paste one, pick a file, or drag one straight from another browser tab. To search from your phone, start it with `--host 0.0.0.0` and open the page there; "pick one" offers the camera. Click any result to search by that result, and use back/forward to retrace. The route menu switches between auto, pose, image, and both. Models load once at startup, so searches after the first are quick. The server only serves images that are in the index. It listens on localhost unless you pass `--host 0.0.0.0`.
 
 Indexes built by an older version are redone automatically the next time you run `index`.
 

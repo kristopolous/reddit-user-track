@@ -1,24 +1,35 @@
 #!/usr/bin/env bash
 # Runs pose-search (see pose/README.md). The first run sets up its own venv
-# in pose/.venv; after that it's instant. Delete pose/.venv to start over.
+# in pose/.venv, and it's updated whenever pose/pyproject.toml changes;
+# otherwise it starts instantly. Delete pose/.venv to start over.
 #
 #   POSE_EXTRA=cpu|cuda   force the onnxruntime flavour (default: cuda if nvidia-smi exists)
 set -e
 here="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 venv="$here/pose/.venv"
 
-if [[ ! -x "$venv/bin/pose-search" ]]; then
-  extra=${POSE_EXTRA:-$(command -v nvidia-smi >/dev/null && echo cuda || echo cpu)}
-  echo "pose-search: first run, installing into $venv ($extra)..." >&2
-  rm -rf "$venv"
+stamp="$venv/.installed"
+if [[ ! -x "$venv/bin/pose-search" || "$here/pose/pyproject.toml" -nt "$stamp" ]]; then
+  # keep whichever flavour an existing venv was set up with
+  extra=${POSE_EXTRA:-$(cat "$stamp" 2>/dev/null || true)}
+  extra=${extra:-$(command -v nvidia-smi >/dev/null && echo cuda || echo cpu)}
+  if [[ -x "$venv/bin/python" ]]; then
+    echo "pose-search: dependencies changed, updating $venv ($extra)..." >&2
+  else
+    echo "pose-search: first run, installing into $venv ($extra)..." >&2
+    if command -v uv >/dev/null; then
+      # pinned: onnxruntime wheels lag behind new Python releases
+      uv venv -q -p 3.12 "$venv"
+    else
+      python3 -m venv "$venv"
+    fi
+  fi
   if command -v uv >/dev/null; then
-    # pinned: onnxruntime wheels lag behind new Python releases
-    uv venv -q -p 3.12 "$venv"
     uv pip install -q -p "$venv/bin/python" -e "$here/pose[$extra]"
   else
-    python3 -m venv "$venv"
     "$venv/bin/pip" install -q -e "$here/pose[$extra]"
   fi
+  echo "$extra" > "$stamp"
 fi
 
 exec "$venv/bin/pose-search" "$@"

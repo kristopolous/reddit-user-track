@@ -101,3 +101,32 @@ def search(store, query_vec, query_pose=None, limit=20, exclude_image=None,
 def search_images(store, image_vec, limit=20, exclude_image=None):
   return [Match(float(p.score), p.payload)
           for p in store.search_images(image_vec, limit=limit, exclude_image=exclude_image)]
+
+
+def query_rows(store, poses, image_vec, image_payload, exclude_image=None, mode="auto",
+               k=4, metric="bones", min_bones=MIN_BONES, min_conf=MIN_CONF):
+  """Everything one query shows: [(label, query_payload, [Match])].
+
+  poses: [(vector, payload)] for the query image, most confident first.
+  mode: auto (pose if trusted, else image), pose, image, or both (one row of
+  each, using the best pose even if untrusted, for comparing the routes).
+  """
+  best = route([pl for _, pl in poses], min_bones, min_conf)
+  point = next(((v, pl) for v, pl in poses if pl is best), None)
+  if point is None and mode in ("pose", "both") and poses:
+    point = poses[0]  # forced/comparing: most confident, even if untrusted
+
+  routes = {"auto": ["pose" if best else "image"], "both": ["pose", "image"]}.get(mode, [mode])
+  rows = []
+  for r in routes:
+    if r == "pose":
+      if point is None:
+        continue
+      vec, payload = point
+      matches = search(store, np.asarray(vec, dtype=np.float32), pose_from_payload(payload),
+                       limit=k, metric=metric, exclude_image=exclude_image,
+                       min_bones=min_bones, min_conf=min_conf)
+      rows.append(("pose" if best else "pose (untrusted)", payload, matches))
+    else:
+      rows.append(("image", image_payload, search_images(store, image_vec, k, exclude_image)))
+  return rows
