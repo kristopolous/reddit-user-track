@@ -9,7 +9,7 @@ A query searches by pose when its skeleton is trustworthy. Otherwise it searches
 
 ## Install
 
-Nothing to do. Run `./pose-search` from the repo root. The first run sets up `pose/.venv`, using CUDA if `nvidia-smi` exists and CPU otherwise; set `POSE_EXTRA=cpu|cuda` to force one. To reinstall, delete `pose/.venv`.
+Nothing to do. Run `./pose-search` from the repo root. The first run sets up `pose/.venv`, using CUDA if `nvidia-smi` exists and CPU otherwise; set `POSE_EXTRA=cpu|cuda` to force one. To reinstall, delete `pose/.venv`. With CUDA, the CUDA and cuDNN libraries come as pip packages inside the venv, so you don't need a system CUDA install. You do need an NVIDIA driver new enough for CUDA 13 (580 or later). If the GPU can't be used, `pose-search` says why at startup.
 
 The device is detected automatically (cuda, then rocm, then coreml, falling back to cpu); `--device` overrides it. The models download on first run: about 140MB into `~/.cache/rtmlib`, plus about 90MB of DINOv2 into `~/.cache/huggingface`.
 

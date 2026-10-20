@@ -8,7 +8,7 @@ and background more than pose search would, which is the trade-off.
 """
 import numpy as np
 
-from .estimator import PROVIDERS, pick_device
+from .estimator import PROVIDERS, check_device, pick_device, prepare_device
 
 MODELS = {
   "small": ("onnx-community/dinov2-small", 384),
@@ -31,8 +31,10 @@ class DinoEmbedder:
     self.dim = width * 2
     self.device = device or pick_device()
     path = hf_hub_download(repo, "onnx/model.onnx")
+    prepare_device(self.device)
     self.session = onnxruntime.InferenceSession(
       path, providers=list(dict.fromkeys([PROVIDERS[self.device], "CPUExecutionProvider"])))
+    check_device(self.device, lambda: self.embed(np.zeros((32, 32, 3), dtype=np.uint8)))
 
   def embed(self, image):
     """image: BGR array (from estimator.load_image). Returns unit-length vector."""

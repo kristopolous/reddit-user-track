@@ -15,7 +15,8 @@ dependencies = [
 [project.optional-dependencies]
 # pick exactly one; onnxruntime and onnxruntime-gpu conflict
 cpu = ["onnxruntime"]
-cuda = ["onnxruntime-gpu"]
+# the extras bring CUDA + cuDNN as pip wheels, so no system install is needed
+cuda = ["onnxruntime-gpu[cuda,cudnn]"]
 
 [project.scripts]
 pose-search = "pose_search.cli:main"

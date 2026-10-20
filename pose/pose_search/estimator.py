@@ -58,6 +58,28 @@ def pick_device():
   return next((d for d, p in PROVIDERS.items() if p in available), "cpu")
 
 
+def prepare_device(device):
+  """Load the CUDA/cuDNN libraries that came as pip wheels (the [cuda]
+  extra). Without this, onnxruntime looks only at system libraries."""
+  import onnxruntime
+  if device == "cuda" and hasattr(onnxruntime, "preload_dlls"):
+    onnxruntime.preload_dlls()
+
+
+def check_device(device, run):
+  """A broken CUDA setup only fails at the first inference, deep in a
+  batch job; try one up front and explain."""
+  if device == "cpu":
+    return
+  try:
+    run()
+  except Exception as ex:
+    raise SystemExit(
+      f"pose-search: the {device} device doesn't work here:\n  {ex}\n\n"
+      f"Usually a missing library or an NVIDIA driver too old for CUDA 13. Either fix that,\n"
+      f"run with --device cpu, or reinstall for CPU: rm -rf pose/.venv; POSE_EXTRA=cpu ./pose-search ...")
+
+
 class RTMPoseEstimator:
   name = "rtmpose"
 
@@ -68,9 +90,12 @@ class RTMPoseEstimator:
     self.device = device or pick_device()
     self.mode = mode
     self.version = f"rtmlib-{rtmlib.__version__ if hasattr(rtmlib, '__version__') else '?'}-{mode}"
+    prepare_device(self.device)
     body = Body(mode=mode, backend="onnxruntime", device=self.device)
     self.det_model = body.det_model
     self.pose_model = body.pose_model
+    blank = np.zeros((64, 64, 3), dtype=np.uint8)
+    check_device(self.device, lambda: self.pose_model(blank, bboxes=[[0, 0, 64, 64]]))
 
   def extract(self, image, scale=1.0):
     """image: BGR array (from load_image). scale: as returned by load_image."""

@@ -9,6 +9,8 @@ here="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 venv="$here/pose/.venv"
 
 stamp="$venv/.installed"
+# uv's installer puts it in ~/.local/bin, which cron/ssh shells often lack
+uv=$(command -v uv || ls "$HOME/.local/bin/uv" "$HOME/.cargo/bin/uv" 2>/dev/null | head -1 || true)
 if [[ ! -x "$venv/bin/pose-search" || "$here/pose/pyproject.toml" -nt "$stamp" ]]; then
   # keep whichever flavour an existing venv was set up with
   extra=${POSE_EXTRA:-$(cat "$stamp" 2>/dev/null || true)}
@@ -17,17 +19,28 @@ if [[ ! -x "$venv/bin/pose-search" || "$here/pose/pyproject.toml" -nt "$stamp" ]
     echo "pose-search: dependencies changed, updating $venv ($extra)..." >&2
   else
     echo "pose-search: first run, installing into $venv ($extra)..." >&2
-    if command -v uv >/dev/null; then
+    if [[ -n $uv ]]; then
       # pinned: onnxruntime wheels lag behind new Python releases
-      uv venv -q -p 3.12 "$venv"
+      "$uv" venv -q -p 3.12 "$venv"
     else
       python3 -m venv "$venv"
     fi
   fi
-  if command -v uv >/dev/null; then
-    uv pip install -q -p "$venv/bin/python" -e "$here/pose[$extra]"
+  if [[ -n $uv ]]; then
+    pip=("$uv" pip)
+    py=(-p "$venv/bin/python")
   else
-    "$venv/bin/pip" install -q -e "$here/pose[$extra]"
+    # a venv made by uv has no pip of its own
+    "$venv/bin/python" -m pip --version >/dev/null 2>&1 || "$venv/bin/python" -m ensurepip -q
+    pip=("$venv/bin/python" -m pip)
+    py=()
+  fi
+  "${pip[@]}" install -q "${py[@]}" -e "$here/pose[$extra]"
+  if [[ $extra == cuda ]]; then
+    # rtmlib depends on the CPU onnxruntime, which shares files with
+    # onnxruntime-gpu: remove it, then repair the GPU build it overwrote
+    "${pip[@]}" uninstall -q "${py[@]}" $([[ -n $uv ]] || echo -y) onnxruntime
+    "${pip[@]}" install -q "${py[@]}" --force-reinstall --no-deps onnxruntime-gpu
   fi
   echo "$extra" > "$stamp"
 fi
