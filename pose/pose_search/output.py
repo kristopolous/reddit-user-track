@@ -74,7 +74,13 @@ def _tail(path, n):
 STYLE = """
   body { background:#181818; color:#ddd; font:13px system-ui, sans-serif; margin:16px }
   .row { display:flex; gap:8px; margin-bottom:18px; align-items:center; overflow-x:auto }
-  .row > div { flex:none }
+  .row > div { flex:none; position:relative }
+  .view { position:absolute; top:6px; right:6px; width:30px; height:30px; border-radius:6px;
+          background:rgba(0,0,0,.65); color:#fff; font-size:18px; line-height:30px; text-align:center;
+          text-decoration:none; opacity:0; transition:opacity .1s }
+  .row > div:hover .view, .view:focus { opacity:1 }
+  .view:hover { background:rgba(0,0,0,.9) }
+  @media (hover:none) { .view { opacity:.8 } }  /* phones: no hover, always show */
   .cell { width:240px; height:240px; background:#000; display:block }
   .query .cell { outline:3px solid #fc0 }
   .cap { font-size:12px; color:#aaa; width:240px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis }
@@ -122,7 +128,9 @@ def _svg(payload, src):
 
 def _cell(payload, caption, src, cls=""):
   path = html.escape(payload["image_path"])
-  return (f'<div class="{cls}" title="{path}" data-path="{path}">{_svg(payload, src)}'
+  # the ⤢ link shows the original picture, no skeleton or crop
+  view = f'<a class=view href="{html.escape(src)}" target=_blank title="view original">⤢</a>'
+  return (f'<div class="{cls}" title="{path}" data-path="{path}">{_svg(payload, src)}{view}'
           f'<div class=cap>{caption}</div></div>')
 
 

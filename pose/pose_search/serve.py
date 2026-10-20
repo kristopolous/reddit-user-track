@@ -39,6 +39,11 @@ PAGE = """<!doctype html>
                  padding-bottom:18px; border-bottom:1px solid #333 }
   #results .arrow { display:none }
   [data-path]:not(.query) { cursor:pointer }
+  #lightbox { position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:10; cursor:zoom-out;
+              display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:16px }
+  #lightbox[hidden] { display:none }
+  #lightbox img { max-width:100%%; max-height:calc(100vh - 70px); object-fit:contain }
+  #lightbox div { color:#aaa; font-size:12px; word-break:break-all; text-align:center }
   [data-path]:not(.query):hover .cell { outline:2px solid #888 }
 </style>
 <div id=bar>
@@ -53,6 +58,7 @@ PAGE = """<!doctype html>
 </div>
 <p id=msg>%(info)s</p>
 <div id=results></div>
+<div id=lightbox hidden><img alt=""><div></div></div>
 <script>
 const $ = s => document.querySelector(s), msg = $('#msg'), results = $('#results');
 let last = null;  // repeat the last search when route/k change
@@ -90,7 +96,18 @@ const fromHash = () => {
 };
 addEventListener('hashchange', fromHash);
 fromHash();
+const lightbox = $('#lightbox');
+lightbox.onclick = () => { lightbox.hidden = true; lightbox.querySelector('img').src = ''; };
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.hidden) lightbox.onclick(); });
 results.onclick = e => {
+  const view = e.target.closest('.view');
+  if (view) {
+    e.preventDefault();
+    lightbox.querySelector('img').src = view.href;
+    lightbox.querySelector('div').textContent = view.closest('[data-path]').dataset.path;
+    lightbox.hidden = false;
+    return;
+  }
   const cell = e.target.closest('[data-path]:not(.query)');
   if (cell) location.hash = 'path=' + encodeURIComponent(cell.dataset.path);
 };

@@ -36,7 +36,15 @@ class VectorStore:
     if url:
       self.client = QdrantClient(url=url)
     else:
-      self.client = QdrantClient(path=os.path.join(index_dir, "qdrant"))
+      try:
+        self.client = QdrantClient(path=os.path.join(index_dir, "qdrant"))
+      except RuntimeError as ex:
+        if "already accessed by another instance" not in str(ex):
+          raise
+        raise SystemExit(
+          f"pose-search: {index_dir} is in use by another pose-search (an `index` or `serve`\n"
+          f"still running?). The built-in store allows one at a time; stop the other one, or\n"
+          f"run a Qdrant server and pass --qdrant-url so several can share it.")
     self._ensure(POSES, vectorize.DIM, models.Distance.DOT, url)
     if image_dim:
       self._ensure(IMAGES, image_dim, models.Distance.COSINE, url)
