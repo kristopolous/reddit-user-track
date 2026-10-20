@@ -279,7 +279,17 @@ class Handler(BaseHTTPRequestHandler):
 def serve(app, host, port):
   Handler.app = app
   server = ThreadingHTTPServer((host, port), Handler)
-  print(f"pose-search: open http://{host}:{port}/  (ctrl-c to stop)", file=sys.stderr)
+  shown = host
+  if host in ("0.0.0.0", ""):
+    # 0.0.0.0 isn't something you can type into a phone; find our LAN address
+    import socket
+    try:
+      with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.connect(("10.255.255.255", 1))  # UDP: sends nothing, just picks a route
+        shown = s.getsockname()[0]
+    except OSError:
+      shown = socket.gethostname()
+  print(f"pose-search: open http://{shown}:{port}/  (ctrl-c to stop)", file=sys.stderr)
   try:
     server.serve_forever()
   except KeyboardInterrupt:
